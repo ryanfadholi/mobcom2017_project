@@ -21,7 +21,7 @@ public class PlaylistActivity extends AppCompatActivity {
                 (CollapsingToolbarLayout) findViewById(R.id.playlist_collapsing_toolbar);
         collapsingToolbar.setTitle("Music Player");
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.playlist_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
