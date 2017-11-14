@@ -5,10 +5,20 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
+
+import java.util.ArrayList;
+
 public class PlaylistActivity extends AppCompatActivity {
+
+    private RecyclerView playlistRecyclerView;
+    private PlaylistAdapter playlistAdapter;
+    private ArrayList<Song> songs = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +39,16 @@ public class PlaylistActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+
+        songs.add(new Song("seepzeeblogi", "garox", "aib gays", 20));
+        songs.add(new Song("seepzeeblogi", "garox", "aib gays", 20));
+
+        playlistRecyclerView = (RecyclerView)findViewById(R.id.playlist);
+        playlistRecyclerView.setHasFixedSize(true);
+        playlistAdapter = new PlaylistAdapter(songs);
+        playlistRecyclerView.setAdapter(playlistAdapter);
+        playlistRecyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
 }
