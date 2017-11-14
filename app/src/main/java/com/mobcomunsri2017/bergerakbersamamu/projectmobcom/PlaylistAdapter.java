@@ -1,6 +1,8 @@
 package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +61,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
         boolean upvoted;
         boolean downvoted;
 
-        public SongViewHolder(View itemView) {
+        public SongViewHolder(final View itemView) {
             super(itemView);
             cover = (ImageView) itemView.findViewById(R.id.cover_item);
             title = (TextView) itemView.findViewById(R.id.title);
@@ -74,6 +76,45 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
                 @Override
                 public void onClick(View v) {
                     upvoted = !upvoted;
+
+                    String snackbarText;
+
+                    if(upvoted){
+                        downvoted = false;
+                        downvoteBtn.setColorFilter(itemView.getResources().getColor(R.color.default_gray));
+
+                        snackbarText = "Upvoted " + title.getText();
+                        ((ImageView) v).setColorFilter(itemView.getResources().getColor(R.color.upvote_green));
+                    } else {
+                        snackbarText = title.getText() + " vote cancelled";
+                        ((ImageView) v).setColorFilter(itemView.getResources().getColor(R.color.default_gray));
+
+                    }
+
+                        Snackbar.make(v, snackbarText, Snackbar.LENGTH_SHORT).show();
+                }
+            });
+
+            downvoteBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    downvoted = !downvoted;
+
+                    String snackbarText;
+
+                    if(downvoted){
+                        upvoted = false;
+                        upvoteBtn.setColorFilter(itemView.getResources().getColor(R.color.default_gray));
+
+                        snackbarText = "Downvoted " + title.getText();
+                        ((ImageView) v).setColorFilter(itemView.getResources().getColor(R.color.downvote_red));
+                    } else {
+                        snackbarText = title.getText() + " vote cancelled";
+                        ((ImageView) v).setColorFilter(itemView.getResources().getColor(R.color.default_gray));
+
+                    }
+
+                    Snackbar.make(v, snackbarText, Snackbar.LENGTH_SHORT).show();
                 }
             });
         }
