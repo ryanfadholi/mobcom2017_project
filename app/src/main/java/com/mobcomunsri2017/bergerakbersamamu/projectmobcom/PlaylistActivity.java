@@ -8,9 +8,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -20,7 +24,8 @@ import java.util.ArrayList;
 
 public class PlaylistActivity extends AppCompatActivity {
 
-    public static final String BASE_WEB_SERVICE_URL = "http://localhost/";
+    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mobcomapi/index.php/";
+    private static String LOG_TAG = "PV.MainActivity";
     private PlaylistService service;
 
     private RecyclerView playlistRecyclerView;
@@ -38,12 +43,13 @@ public class PlaylistActivity extends AppCompatActivity {
                 (CollapsingToolbarLayout) findViewById(R.id.playlist_collapsing_toolbar);
         collapsingToolbar.setTitle("Music Player");
 
+        this.initPlaylist();
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.playlist_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+               attemptSongRequest(view);
             }
         });
 
@@ -56,6 +62,8 @@ public class PlaylistActivity extends AppCompatActivity {
         playlistAdapter = new PlaylistAdapter(songs);
         playlistRecyclerView.setAdapter(playlistAdapter);
         playlistRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+
     }
 
     @Override
@@ -76,6 +84,35 @@ public class PlaylistActivity extends AppCompatActivity {
         Retrofit retrofit = builder.client(httpClient.build()).build();
 
         this.service = retrofit.create(PlaylistService.class);
+    }
+
+    private void attemptSongRequest(final View view){
+        Call<InsertRequestResponse> call = service.sendRequest("1",null,null);
+
+        call.enqueue(new Callback<InsertRequestResponse>() {
+
+            @Override
+            public void onResponse(Call<InsertRequestResponse> call, Response<InsertRequestResponse> response) {
+                Log.e(LOG_TAG,"JSON error? " + String.valueOf(response.body().getError()));
+
+                String snackbarContent;
+                if(!response.body().getError()){
+                    snackbarContent = "Song requested successfully";
+                } else {
+                    snackbarContent = "Failed to request song";
+                    Log.e(LOG_TAG,response.body().getError_message());
+                }
+
+                Snackbar.make(view, snackbarContent, Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+            }
+
+            @Override
+            public void onFailure(Call<InsertRequestResponse> call, Throwable t) {
+                Log.e(LOG_TAG,"Error! " + t.toString());
+            }
+        });
     }
 
 }

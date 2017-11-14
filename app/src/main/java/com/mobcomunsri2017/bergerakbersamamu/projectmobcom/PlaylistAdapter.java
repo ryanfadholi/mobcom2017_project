@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -53,12 +54,28 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
         ImageView cover;
         TextView title;
         TextView artist;
+        ImageView upvoteBtn;
+        ImageView downvoteBtn;
+        boolean upvoted;
+        boolean downvoted;
 
         public SongViewHolder(View itemView) {
             super(itemView);
             cover = (ImageView) itemView.findViewById(R.id.cover_item);
             title = (TextView) itemView.findViewById(R.id.title);
             artist = (TextView) itemView.findViewById(R.id.artist);
+            upvoteBtn = (ImageView) itemView.findViewById(R.id.upvote);
+            downvoteBtn = (ImageView) itemView.findViewById(R.id.downvote);
+
+            upvoted = false;
+            downvoted = false;
+
+            upvoteBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    upvoted = !upvoted;
+                }
+            });
         }
     }
 
