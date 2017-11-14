@@ -8,7 +8,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.converter.jackson.JacksonConverterFactory;
+
 public class PlaylistActivity extends AppCompatActivity {
+
+    public static final String BASE_WEB_SERVICE_URL = "http://localhost/";
+    private PlaylistService service;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +36,26 @@ public class PlaylistActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        if(this.service == null){
+            this.initPlaylist();
+        }
+
+        super.onResume();
+    }
+
+    private PlaylistService initPlaylist(){
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+
+        Retrofit.Builder builder = new Retrofit.Builder().baseUrl(BASE_WEB_SERVICE_URL)
+                .addConverterFactory(JacksonConverterFactory.create());
+
+        Retrofit retrofit = builder.client(httpClient.build()).build();
+
+        this.service = retrofit.create(PlaylistService.class);
     }
 
 }
