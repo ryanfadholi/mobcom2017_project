@@ -24,9 +24,10 @@ import java.util.ArrayList;
 
 public class PlaylistActivity extends AppCompatActivity {
 
-    public static final String BASE_WEB_SERVICE_URL = "http://192.168.43.144/mpcafe/";
+    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.169/mpcafe/";
+//    public static final String BASE_WEB_SERVICE_URL = "http://192.168.43.144/mpcafe/";
 //    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mpcafe/";
-    
+
     private static String LOG_TAG = "PV.MainActivity";
     private PlaylistService service;
 
@@ -56,8 +57,8 @@ public class PlaylistActivity extends AppCompatActivity {
         });
 
 
-        songs.add(new Song("seepzeeblogi", "garox", "aib gays", 20));
-        songs.add(new Song("seepzeeblogi", "garox", "aib gays", 20));
+        songs.add(new Song("Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
+        songs.add(new Song("Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
 
         playlistRecyclerView = (RecyclerView)findViewById(R.id.playlist);
         playlistRecyclerView.setHasFixedSize(true);
