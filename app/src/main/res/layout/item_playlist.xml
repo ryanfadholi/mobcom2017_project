@@ -57,15 +57,16 @@
                 android:layout_width="@dimen/vote_btn"
                 android:layout_height="@dimen/vote_btn"
                 android:id="@+id/upvote"
-                android:tint="#9E9E9E"
+                android:tint="@color/default_gray"
                 android:layout_marginBottom="8dp"
+                android:layout_marginRight="8dp"
                 android:src="@drawable/ic_arrow_up_bold"/>
 
             <ImageView
                 android:layout_width="@dimen/vote_btn"
                 android:layout_height="@dimen/vote_btn"
                 android:id="@+id/downvote"
-                android:tint="#9E9E9E"
+                android:tint="@color/default_gray"
                 android:layout_marginTop="8dp"
                 android:src="@drawable/ic_arrow_down_bold"/>
 
