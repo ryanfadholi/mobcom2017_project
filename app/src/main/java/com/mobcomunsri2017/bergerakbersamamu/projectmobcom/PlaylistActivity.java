@@ -24,7 +24,8 @@ import java.util.ArrayList;
 
 public class PlaylistActivity extends AppCompatActivity {
 
-    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mobcomapi/index.php/";
+//    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mobcomapi/index.php/";
+    public static final String BASE_WEB_SERVICE_URL = "http://192.168.43.144/mpcafe/";
     private static String LOG_TAG = "PV.MainActivity";
     private PlaylistService service;
 
