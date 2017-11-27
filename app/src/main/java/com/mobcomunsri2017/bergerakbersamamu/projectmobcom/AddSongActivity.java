@@ -2,6 +2,7 @@ package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +26,11 @@ import java.util.ArrayList;
  */
 
 public class AddSongActivity extends AppCompatActivity implements AddSongAdapter.AddSongAdapterListener {
-    private static final String TAG = AddSongActivity.class.getSimpleName();
+
+    private static final String LOG_TAG = "TG.AddSongActivity";
+
+    public static String EXTRA_MUSIC_ID = "AddSong.MusicID";
+
     private RecyclerView addSongRecyclerView;
     private AddSongAdapter addSongAdapter;
     private ArrayList<Song> songs = new ArrayList<>();
@@ -43,10 +49,6 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
 //        collapsingToolbar.setTitle("Add Song To Playlist");
 
         //this.initPlaylist();
-
-//        songs.add(new Song("seepzeeblogi", "garox", "aib gays", 20));
-//        songs.add(new Song("seepzeeblogi", "garox", "aib gays", 20));
-//        songs.add(new Song("TILayo", "cece", "dung dang ding yuk kita ngoding", 20));
 
         addSongRecyclerView = (RecyclerView)findViewById(R.id.add_song);
         addSongRecyclerView.setHasFixedSize(true);
@@ -97,7 +99,17 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         songs.add(new Song("1","Album Satu", "Artist Satu", "Judul Satu", 20));
         songs.add(new Song("2","Album Dua", "Artist Dua", "Judul Dua", 20));
         songs.add(new Song("3","Album Tiga", "Artist Tiga", "Judul Tiga", 20));
-        
+
+    }
+
+    private void startRequestSong(String musicID){
+        Intent returnIntent = new Intent();
+
+        Log.e(LOG_TAG,"Song Request Intent method handler called");
+
+        returnIntent.putExtra(EXTRA_MUSIC_ID, musicID);
+        setResult(RESULT_OK,returnIntent);
+        finish();
     }
 
     @Override
@@ -168,5 +180,6 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
     @Override
     public void onSongSelected(Song song) {
         Toast.makeText(getApplicationContext(), "Selected: " + song.getTitle() + ", " + song.getArtist(), Toast.LENGTH_LONG).show();
+        startRequestSong(song.getMusicID());
     }
 }

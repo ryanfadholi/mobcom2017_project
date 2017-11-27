@@ -2,6 +2,7 @@ package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import java.util.List;
 
 public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongViewHolder> {
 
+    public static final String LOG_TAG = "TG.AddSongAdapter";
     List<Song> songs;
     List<Song> songsFiltered;
     private Context context;
@@ -43,7 +45,8 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // send selected contact in callback
+                    // send selected song in callback
+                    Log.e(LOG_TAG, "itemOnClick Called");
                     listener.onSongSelected(songsFiltered.get(getAdapterPosition()));
                 }
             });

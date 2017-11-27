@@ -28,8 +28,9 @@ public class PlaylistActivity extends AppCompatActivity {
     public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mpcafe/";
 //    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mpcafe/";
 
-    private static String LOG_TAG = "PV.MainActivity";
-    private PlaylistService service;
+    private static final String LOG_TAG = "TG.PlaylistActivity";
+    public static final int REQUEST_CODE_ADD_SONG = 1;
+    public static PlaylistService service;
 
     private RecyclerView playlistRecyclerView;
     private PlaylistAdapter playlistAdapter;
@@ -52,8 +53,7 @@ public class PlaylistActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               attemptSongRequest(view);
-                startActivity(new Intent(PlaylistActivity.this, AddSongActivity.class));
+                startActivityForResult(new Intent(PlaylistActivity.this, AddSongActivity.class), REQUEST_CODE_ADD_SONG);
             }
         });
 
@@ -93,7 +93,22 @@ public class PlaylistActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    private void initPlaylist(){
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e(LOG_TAG,"OnActivityResult called");
+
+        if (requestCode == REQUEST_CODE_ADD_SONG) {
+            if (resultCode == RESULT_OK) {
+                String musicID = data.getStringExtra(AddSongActivity.EXTRA_MUSIC_ID);
+
+                if(musicID == null) return;
+                attemptSongRequest(findViewById(android.R.id.content), musicID);
+            }
+        }
+    }
+
+    public void initPlaylist(){
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
         Retrofit.Builder builder = new Retrofit.Builder().baseUrl(BASE_WEB_SERVICE_URL)
@@ -104,8 +119,8 @@ public class PlaylistActivity extends AppCompatActivity {
         this.service = retrofit.create(PlaylistService.class);
     }
 
-    private void attemptSongRequest(final View view){
-        Call<InsertRequestResponse> call = service.sendRequest("1",null,null);
+    private void attemptSongRequest(final View view, String musicID){
+        Call<InsertRequestResponse> call = service.sendRequest(musicID,null,null);
 
         call.enqueue(new Callback<InsertRequestResponse>() {
 
