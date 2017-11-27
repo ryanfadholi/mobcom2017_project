@@ -5,16 +5,22 @@ package com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures;
  */
 
 public class Song {
+    private String musicID;
     private String album;
     private String artist;
     private String title;
     private int playtimeInMs;
 
-    public Song(String album, String artist, String title, int playtimeInMs) {
+    public Song(String musicID, String album, String artist, String title, int playtimeInMs) {
+        this.musicID = musicID;
         this.album = album;
         this.artist = artist;
         this.title = title;
         this.playtimeInMs = playtimeInMs;
+    }
+
+    public String getMusicID() {
+        return musicID;
     }
 
     public String getAlbum() {

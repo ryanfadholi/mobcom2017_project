@@ -70,6 +70,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
         ImageView cover;
         TextView title;
         TextView artist;
+        Button addBtn;
         ImageView upvoteBtn;
         ImageView downvoteBtn;
         boolean upvoted;

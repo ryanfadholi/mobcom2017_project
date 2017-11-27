@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 public class PlaylistActivity extends AppCompatActivity {
 
-    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.169/mpcafe/";
+    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mpcafe/";
 //    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mpcafe/";
 
     private static String LOG_TAG = "PV.MainActivity";
@@ -58,20 +58,20 @@ public class PlaylistActivity extends AppCompatActivity {
         });
 
 
-        songs.add(new Song("Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
+        songs.add(new Song("1", "Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
+        songs.add(new Song("2", "Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
+        songs.add(new Song("1", "Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
+        songs.add(new Song("2", "Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
+        songs.add(new Song("1", "Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
+        songs.add(new Song("2", "Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
+        songs.add(new Song("1", "Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
+        songs.add(new Song("2", "Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
+        songs.add(new Song("1", "Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
+        songs.add(new Song("2", "Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
+        songs.add(new Song("1", "Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
+        songs.add(new Song("2", "Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
+        songs.add(new Song("1", "Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
+        songs.add(new Song("2", "Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
 
 
 

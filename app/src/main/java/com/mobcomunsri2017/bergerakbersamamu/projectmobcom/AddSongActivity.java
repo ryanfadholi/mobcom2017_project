@@ -94,12 +94,10 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
 //        MyApplication.getInstance().addToRequestQueue(request);
         //TODO: Implementasi di Retrofit
 
-        songs.add(new Song("seepzeeblogi", "garox", "aib gays", 20));
-        songs.add(new Song("seepzeeblogi", "garox", "aib gays", 20));
-        songs.add(new Song("TILayo", "cece", "dung dang ding yuk kita ngoding", 20));
-        songs.add(new Song("Perindo", "Partai Perindo", "Mars Perindo", 20));
-
-
+        songs.add(new Song("1","Album Satu", "Artist Satu", "Judul Satu", 20));
+        songs.add(new Song("2","Album Dua", "Artist Dua", "Judul Dua", 20));
+        songs.add(new Song("3","Album Tiga", "Artist Tiga", "Judul Tiga", 20));
+        
     }
 
     @Override
