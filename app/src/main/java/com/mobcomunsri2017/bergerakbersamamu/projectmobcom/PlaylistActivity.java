@@ -1,5 +1,6 @@
 package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -52,6 +53,7 @@ public class PlaylistActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                attemptSongRequest(view);
+                startActivity(new Intent(PlaylistActivity.this, AddSongActivity.class));
             }
         });
 

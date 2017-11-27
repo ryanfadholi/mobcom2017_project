@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,14 +24,27 @@ import java.util.List;
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongViewHolder> {
 
     List<Song> songs;
+    boolean inAddSong = false;
 
     public PlaylistAdapter(List<Song> songs) {
         this.songs = songs;
     }
 
+    public PlaylistAdapter(List<Song> songs, boolean inAddSong) {
+        this.songs = songs;
+        this.inAddSong = inAddSong;
+    }
+
     @Override
     public SongViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playlist, parent, false);
+        int itemView;
+        if (!this.inAddSong) {
+            itemView = R.layout.item_playlist;
+        } else {
+            itemView = R.layout.item_add_song;
+        }
+
+        View v = LayoutInflater.from(parent.getContext()).inflate(itemView, parent, false);
         SongViewHolder svh = new SongViewHolder(v);
         return svh;
     }
@@ -68,6 +82,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
             artist = (TextView) itemView.findViewById(R.id.artist);
             upvoteBtn = (ImageView) itemView.findViewById(R.id.upvote);
             downvoteBtn = (ImageView) itemView.findViewById(R.id.downvote);
+            addBtn = (Button) itemView.findViewById(R.id.button_add_song);
 
             upvoted = false;
             downvoted = false;
@@ -91,7 +106,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
 
                     }
 
-                        Snackbar.make(v, snackbarText, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(v, snackbarText, Snackbar.LENGTH_SHORT).show();
                 }
             });
 

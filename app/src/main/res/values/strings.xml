@@ -1,5 +1,8 @@
 <resources>
-    <string name="app_name">Project MobCom</string>
+    <string name="app_name">TuneGether</string>
     <string name="endpoint">http://192.168.43.144/mpcafe/</string>
     <string name="title">title</string>
+    <string name="action_search">Find Song</string>
+    <string name="search_products">search song</string>
+    <string name="search_hint">Type title…</string>
 </resources>
