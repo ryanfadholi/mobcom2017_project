@@ -58,20 +58,20 @@ public class PlaylistActivity extends AppCompatActivity {
         });
 
 
-        songs.add(new Song("1", "Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("2", "Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("1", "Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("2", "Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("1", "Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("2", "Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("1", "Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("2", "Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("1", "Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("2", "Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("1", "Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("2", "Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("1", "Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("2", "Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
+        songs.add(new Song("1", "Mars Perindo", "Hary Tanoesoedibjo","Partai Perindo"));
+        songs.add(new Song("2", "Kapten Tsubasa", null,null));
+        songs.add(new Song("1", "Mars Perindo", "Hary Tanoesoedibjo","Partai Perindo"));
+        songs.add(new Song("2", "Kapten Tsubasa", null,null));
+        songs.add(new Song("1", "Mars Perindo", "Hary Tanoesoedibjo","Partai Perindo"));
+        songs.add(new Song("2", "Kapten Tsubasa", null,null));
+        songs.add(new Song("1", "Mars Perindo", "Hary Tanoesoedibjo","Partai Perindo"));
+        songs.add(new Song("2", "Kapten Tsubasa", null,null));
+        songs.add(new Song("1", "Mars Perindo", "Hary Tanoesoedibjo","Partai Perindo"));
+        songs.add(new Song("2", "Kapten Tsubasa", null,null));
+        songs.add(new Song("1", "Mars Perindo", "Hary Tanoesoedibjo","Partai Perindo"));
+        songs.add(new Song("2", "Kapten Tsubasa", null,null));
+        songs.add(new Song("1", "Mars Perindo", "Hary Tanoesoedibjo","Partai Perindo"));
+        songs.add(new Song("2", "Kapten Tsubasa", null,null));
 
 
 
@@ -86,10 +86,7 @@ public class PlaylistActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        if(this.service == null){
-            this.initPlaylist();
-        }
-
+        checkService();
         super.onResume();
     }
 
@@ -108,7 +105,13 @@ public class PlaylistActivity extends AppCompatActivity {
         }
     }
 
-    public void initPlaylist(){
+    public static void checkService(){
+        if(service == null){
+            initPlaylist();
+        }
+    }
+
+    public static void initPlaylist(){
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
         Retrofit.Builder builder = new Retrofit.Builder().baseUrl(BASE_WEB_SERVICE_URL)
@@ -116,7 +119,7 @@ public class PlaylistActivity extends AppCompatActivity {
 
         Retrofit retrofit = builder.client(httpClient.build()).build();
 
-        this.service = retrofit.create(PlaylistService.class);
+        service = retrofit.create(PlaylistService.class);
     }
 
     private void attemptSongRequest(final View view, String musicID){
@@ -126,7 +129,7 @@ public class PlaylistActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call<InsertRequestResponse> call, Response<InsertRequestResponse> response) {
-                Log.e(LOG_TAG,"JSON error? " + String.valueOf(response.body().getError()));
+                Log.e(LOG_TAG,"Insert Request JSON error? " + String.valueOf(response.body().getError()));
 
                 String snackbarContent;
                 if(!response.body().getError()){
@@ -147,5 +150,7 @@ public class PlaylistActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
 }

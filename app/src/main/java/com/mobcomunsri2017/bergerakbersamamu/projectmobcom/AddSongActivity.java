@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +21,12 @@ import android.widget.Toast;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
 
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.mobcomunsri2017.bergerakbersamamu.projectmobcom.PlaylistActivity.service;
 
 /**
  * Created by Mifta on 11/15/2017.
@@ -60,46 +67,41 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         addSongRecyclerView.setAdapter(addSongAdapter);
         addSongRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        fetchContacts();
+        fetchSongs();
 
     }
 
-    private void fetchContacts() {
-//        JsonArrayRequest request = new JsonArrayRequest(URL,
-//                new Response.Listener<JSONArray>() {
-//                    @Override
-//                    public void onResponse(JSONArray response) {
-//                        if (response == null) {
-//                            Toast.makeText(getApplicationContext(), "Couldn't fetch the contacts! Pleas try again.", Toast.LENGTH_LONG).show();
-//                            return;
-//                        }
-//
-//                        List<Song> items = new Gson().fromJson(response.toString(), new TypeToken<List<Song>>() {
-//                        }.getType());
-//
-//                        // adding contacts to contacts list
-//                        songs.clear();
-//                        songs.addAll(items);
-//
-//                        // refreshing recycler view
-//                        addSongAdapter.notifyDataSetChanged();
-//                    }
-//                }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                // error in getting json
-//                Log.e(TAG, "Error: " + error.getMessage());
-//                Toast.makeText(getApplicationContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        MyApplication.getInstance().addToRequestQueue(request);
-        //TODO: Implementasi di Retrofit
+    private void fetchSongs() {
 
-        songs.add(new Song("1","Album Satu", "Artist Satu", "Judul Satu", 20));
-        songs.add(new Song("2","Album Dua", "Artist Dua", "Judul Dua", 20));
-        songs.add(new Song("3","Album Tiga", "Artist Tiga", "Judul Tiga", 20));
+        PlaylistActivity.checkService();
+        Call<GetMusicsRequestResponse> call = service.getMusics();
 
+        call.enqueue(new Callback<GetMusicsRequestResponse>() {
+
+            @Override
+            public void onResponse(Call<GetMusicsRequestResponse> call, Response<GetMusicsRequestResponse> response) {
+                Log.e(LOG_TAG,"Get Musics JSON error? " + String.valueOf(response.body().isError()));
+
+                if(response.body().isError()){
+                    Log.e(LOG_TAG, "Get Musics JSON Error, " + response.body().getErrorMessage());
+                    Snackbar.make(findViewById(android.R.id.content),
+                            "We can't check available songs right now. " +
+                                    "Please try again in a moment.",
+                            Snackbar.LENGTH_LONG);
+                    songs.clear();
+                    return;
+                }
+
+                songs.clear();
+                songs.addAll(response.body().getMusics());
+                addSongAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Call<GetMusicsRequestResponse> call, Throwable t) {
+                Log.e(LOG_TAG,"Error! " + t.toString());
+            }
+        });
     }
 
     private void startRequestSong(String musicID){
