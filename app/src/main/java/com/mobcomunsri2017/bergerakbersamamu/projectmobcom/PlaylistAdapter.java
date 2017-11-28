@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Request;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
 
 import org.w3c.dom.Text;
@@ -24,16 +25,19 @@ import java.util.List;
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongViewHolder> {
 
     List<Song> songs;
+    List<Request> requests;
     boolean inAddSong = false;
 
-    public PlaylistAdapter(List<Song> songs) {
-        this.songs = songs;
-    }
+//    public PlaylistAdapter(List<Song> songs) {
+//        this.songs = songs;
+//    }
 
     public PlaylistAdapter(List<Song> songs, boolean inAddSong) {
         this.songs = songs;
         this.inAddSong = inAddSong;
     }
+
+    public PlaylistAdapter(List<Request> requests) {this.requests = requests;}
 
     @Override
     public SongViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -51,8 +55,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
 
     @Override
     public void onBindViewHolder(SongViewHolder holder, int position) {
-        holder.title.setText(songs.get(position).getTitle());
-        holder.artist.setText(songs.get(position).getArtist());
+        holder.title.setText(requests.get(position).getTitle());
+        holder.artist.setText(requests.get(position).getArtist());
     }
 
     @Override
@@ -62,7 +66,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
 
     @Override
     public int getItemCount() {
-        return songs.size();
+        return requests.size();
     }
 
     public static class SongViewHolder extends RecyclerView.ViewHolder {

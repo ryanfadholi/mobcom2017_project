@@ -24,7 +24,6 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
 
     public static final String LOG_TAG = "TG.AddSongAdapter";
     List<Song> songs;
-    List<Song> songsFiltered;
     private Context context;
     private AddSongAdapterListener listener;
 
@@ -47,19 +46,17 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
                 public void onClick(View view) {
                     // send selected song in callback
                     Log.e(LOG_TAG, "itemOnClick Called");
-                    listener.onSongSelected(songsFiltered.get(getAdapterPosition()));
+                    listener.onSongSelected(songs.get(getAdapterPosition()));
                 }
             });
 
         }
     }
 
-
     public AddSongAdapter(Context context, List<Song> songs, AddSongAdapterListener listener) {
         this.context = context;
         this.listener = listener;
         this.songs = songs;
-        this.songsFiltered = songs;
     }
 
     @Override
@@ -72,7 +69,6 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
 
     @Override
     public void onBindViewHolder(SongViewHolder holder, final int position) {
-        final Song song = songsFiltered.get(position);
         holder.title.setText(songs.get(position).getTitle());
         holder.artist.setText(songs.get(position).getArtist());
 
@@ -84,44 +80,7 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
 
     @Override
     public int getItemCount() {
-        return songsFiltered.size();
-    }
-
-    //@Override
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence charSequence) {
-                String charString = charSequence.toString();
-                if (charString.isEmpty()) {
-                    songsFiltered = songs;
-                } else {
-                    List<Song> filteredList = new ArrayList<>();
-                    for (Song row : songs) {
-
-                        // name match condition. this might differ depending on your requirement
-                        // here we are looking for name or phone number match
-                        if (row.getTitle().toLowerCase().contains(charString.toLowerCase()) || row.getArtist().toLowerCase().contains(charString.toLowerCase())
-                                || row.getAlbum().toLowerCase().contains(charString.toLowerCase()))
-                        {
-                            filteredList.add(row);
-                        }
-                    }
-
-                    songsFiltered = filteredList;
-                }
-
-                FilterResults filterResults = new FilterResults();
-                filterResults.values = songsFiltered;
-                return filterResults;
-            }
-
-            @Override
-            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                songsFiltered = (ArrayList<Song>) filterResults.values;
-                notifyDataSetChanged();
-            }
-        };
+        return songs.size();
     }
 
     @Override
@@ -133,7 +92,6 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
         songs = list;
         notifyDataSetChanged();
     }
-
 
     public interface AddSongAdapterListener {
         void onSongSelected(Song song);

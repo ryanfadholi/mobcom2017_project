@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,7 +42,7 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
     private RecyclerView addSongRecyclerView;
     private AddSongAdapter addSongAdapter;
     private ArrayList<Song> songs = new ArrayList<>();
-   // private List<Song> songList;
+    private List<Song> songList;
     private SearchView searchView;
 
     @Override
@@ -94,6 +95,8 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
 
                 songs.clear();
                 songs.addAll(response.body().getMusics());
+                songList = new ArrayList<>();
+                songList.addAll(songs);
                 addSongAdapter.notifyDataSetChanged();
             }
 
@@ -131,14 +134,26 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // filter recycler view when query submitted
-                addSongAdapter.getFilter().filter(query);
+                //addSongAdapter.getFilter().filter(query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String query) {
                 // filter recycler view when text is changed
-                addSongAdapter.getFilter().filter(query);
+                query = query.toLowerCase();
+                songs.clear();
+                if (query.length() <= 0) {
+                    songs.addAll(songList);
+                } else {
+                    for (Song song : songList) {
+                        if (song.getTitle().toLowerCase().contains(query)) {
+                            songs.add(song);
+                        }
+                    }
+                }
+
+                addSongAdapter.notifyDataSetChanged();
                 return false;
             }
         });
