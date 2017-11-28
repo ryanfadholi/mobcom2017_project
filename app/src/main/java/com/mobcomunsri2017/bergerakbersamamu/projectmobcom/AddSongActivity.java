@@ -21,7 +21,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
 
@@ -65,6 +64,8 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         setContentView(R.layout.activity_add_song);
         Toolbar toolbar = findViewById(R.id.add_song_toolbar);
         setSupportActionBar(toolbar);
+
+        setTitle("Tracklist");
 
         addSongRecyclerView = findViewById(R.id.add_song);
         addSongRecyclerView.setHasFixedSize(true);

@@ -2,6 +2,7 @@ package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
@@ -36,11 +37,84 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
         ImageView cover;
         TextView title;
         TextView artist;
+        TextView counter;
+        ImageView upvote;
+        ImageView downvote;
+
+        boolean upvoted;
+        boolean downvoted;
+        int voteCounter = 0;
+
+        int defaultColorCode;
+        int upColorCode;
+        int downColorCode;
+
         public SongViewHolder(final View itemView) {
             super(itemView);
-            cover = (ImageView) itemView.findViewById(R.id.song_cover);
-            title = (TextView) itemView.findViewById(R.id.song_title);
-            artist = (TextView) itemView.findViewById(R.id.song_artist);
+            cover = itemView.findViewById(R.id.song_cover);
+            title = itemView.findViewById(R.id.song_title);
+            artist = itemView.findViewById(R.id.song_artist);
+            counter = itemView.findViewById(R.id.song_vote_count);
+            upvote = itemView.findViewById(R.id.song_upvote);
+            downvote = itemView.findViewById(R.id.song_downvote);
+
+            upvoted = false;
+            downvoted = false;
+
+            defaultColorCode = itemView.getResources().getColor(R.color.default_gray);
+            upColorCode = itemView.getResources().getColor(R.color.upvote_green);
+            downColorCode = itemView.getResources().getColor(R.color.downvote_red);
+
+            upvote.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    upvoted = !upvoted;
+
+                    String snackbarText;
+
+                    if(upvoted){
+                        downvoted = false;
+                        downvote.setColorFilter(defaultColorCode);
+
+                        snackbarText = "Upvoted " + title.getText();
+                        ((ImageView) v).setColorFilter(upColorCode);
+                        voteCounter = 1;
+
+                    } else {
+                        snackbarText = title.getText() + " vote cancelled";
+                        ((ImageView) v).setColorFilter(defaultColorCode);
+                        voteCounter = 0;
+                    }
+
+                    updateCounter();
+                    Snackbar.make(v, snackbarText, Snackbar.LENGTH_SHORT).show();
+                }
+            });
+
+            downvote.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    downvoted = !downvoted;
+
+                    String snackbarText;
+
+                    if(downvoted){
+                        upvoted = false;
+                        upvote.setColorFilter(defaultColorCode);
+
+                        snackbarText = "Downvoted " + title.getText();
+                        ((ImageView) v).setColorFilter(downColorCode);
+                        voteCounter = -1;
+                    } else {
+                        snackbarText = title.getText() + " vote cancelled";
+                        ((ImageView) v).setColorFilter(defaultColorCode);
+                        voteCounter = 0;
+                    }
+
+                    updateCounter();
+                    Snackbar.make(v, snackbarText, Snackbar.LENGTH_SHORT).show();
+                }
+            });
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -51,6 +125,22 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
                     notifyDataSetChanged();
                 }
             });
+
+        }
+
+        public void updateCounter(){
+            String counterText = String.valueOf(voteCounter);
+
+            if(voteCounter > 0){
+                counterText = "+" + counterText;
+                counter.setTextColor(upColorCode);
+            } else if(voteCounter < 0){
+                counter.setTextColor(downColorCode);
+            } else {
+                counter.setTextColor(defaultColorCode);
+            }
+
+            counter.setText(counterText);
 
         }
     }

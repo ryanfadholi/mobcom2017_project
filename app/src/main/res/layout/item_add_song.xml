@@ -46,6 +46,41 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height= "wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/vote_btn"
+                android:layout_height="@dimen/vote_btn"
+                android:id="@+id/song_upvote"
+                android:tint="@color/default_gray"
+                android:layout_marginBottom="4dp"
+                android:layout_marginRight="4dp"
+                android:src="@drawable/ic_arrow_up_bold"/>
+
+            <TextView
+                android:id="@+id/song_vote_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="0"
+                android:textSize="20dp" />
+
+            <ImageView
+                android:layout_width="@dimen/vote_btn"
+                android:layout_height="@dimen/vote_btn"
+                android:id="@+id/song_downvote"
+                android:tint="@color/default_gray"
+                android:layout_marginTop="4dp"
+                android:layout_marginLeft="4dp"
+                android:src="@drawable/ic_arrow_down_bold"/>
+
+        </LinearLayout>
+
     </RelativeLayout>
 
 </android.support.v7.widget.CardView>
