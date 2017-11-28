@@ -18,4 +18,7 @@ public interface PlaylistService {
     Call<InsertRequestResponse> sendRequest(@Field("musics_id") String musics_id,
                                         @Field("priority") String priority,
                                         @Field("schedule") String schedule);
+
+    @GET("musics/get_musics")
+    Call<GetMusicsRequestResponse> getMusics();
 }

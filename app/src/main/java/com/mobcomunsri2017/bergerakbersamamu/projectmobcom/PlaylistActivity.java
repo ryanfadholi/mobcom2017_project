@@ -1,5 +1,6 @@
 package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -24,12 +25,13 @@ import java.util.ArrayList;
 
 public class PlaylistActivity extends AppCompatActivity {
 
-    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.169/mpcafe/";
+    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mpcafe/";
 //    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mpcafe/";
 //    public static final String BASE_WEB_SERVICE_URL = "http://10.102.224.74/mpcafe/";
 
-    private static String LOG_TAG = "PV.MainActivity";
-    private PlaylistService service;
+    private static final String LOG_TAG = "TG.PlaylistActivity";
+    public static final int REQUEST_CODE_ADD_SONG = 1;
+    public static PlaylistService service;
 
     private RecyclerView playlistRecyclerView;
     private PlaylistAdapter playlistAdapter;
@@ -52,25 +54,25 @@ public class PlaylistActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               attemptSongRequest(view);
+                startActivityForResult(new Intent(PlaylistActivity.this, AddSongActivity.class), REQUEST_CODE_ADD_SONG);
             }
         });
 
 
-        songs.add(new Song("Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
-        songs.add(new Song("Partai Perindo", "Hary Tanoesoedibjo", "Mars Perindo", 20));
-        songs.add(new Song("Unknown Album", "Unknown Artist", "Kapten Tsubasa", 20));
+        songs.add(new Song("1", "Mars Perindo", "Hary Tanoesoedibjo","Partai Perindo"));
+        songs.add(new Song("2", "Kapten Tsubasa", null,null));
+        songs.add(new Song("1", "Mars Perindo", "Hary Tanoesoedibjo","Partai Perindo"));
+        songs.add(new Song("2", "Kapten Tsubasa", null,null));
+        songs.add(new Song("1", "Mars Perindo", "Hary Tanoesoedibjo","Partai Perindo"));
+        songs.add(new Song("2", "Kapten Tsubasa", null,null));
+        songs.add(new Song("1", "Mars Perindo", "Hary Tanoesoedibjo","Partai Perindo"));
+        songs.add(new Song("2", "Kapten Tsubasa", null,null));
+        songs.add(new Song("1", "Mars Perindo", "Hary Tanoesoedibjo","Partai Perindo"));
+        songs.add(new Song("2", "Kapten Tsubasa", null,null));
+        songs.add(new Song("1", "Mars Perindo", "Hary Tanoesoedibjo","Partai Perindo"));
+        songs.add(new Song("2", "Kapten Tsubasa", null,null));
+        songs.add(new Song("1", "Mars Perindo", "Hary Tanoesoedibjo","Partai Perindo"));
+        songs.add(new Song("2", "Kapten Tsubasa", null,null));
 
 
 
@@ -85,14 +87,32 @@ public class PlaylistActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        if(this.service == null){
-            this.initPlaylist();
-        }
-
+        checkService();
         super.onResume();
     }
 
-    private void initPlaylist(){
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e(LOG_TAG,"OnActivityResult called");
+
+        if (requestCode == REQUEST_CODE_ADD_SONG) {
+            if (resultCode == RESULT_OK) {
+                String musicID = data.getStringExtra(AddSongActivity.EXTRA_MUSIC_ID);
+
+                if(musicID == null) return;
+                attemptSongRequest(findViewById(android.R.id.content), musicID);
+            }
+        }
+    }
+
+    public static void checkService(){
+        if(service == null){
+            initPlaylist();
+        }
+    }
+
+    public static void initPlaylist(){
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
         Retrofit.Builder builder = new Retrofit.Builder().baseUrl(BASE_WEB_SERVICE_URL)
@@ -100,17 +120,17 @@ public class PlaylistActivity extends AppCompatActivity {
 
         Retrofit retrofit = builder.client(httpClient.build()).build();
 
-        this.service = retrofit.create(PlaylistService.class);
+        service = retrofit.create(PlaylistService.class);
     }
 
-    private void attemptSongRequest(final View view){
-        Call<InsertRequestResponse> call = service.sendRequest("1",null,null);
+    private void attemptSongRequest(final View view, String musicID){
+        Call<InsertRequestResponse> call = service.sendRequest(musicID,null,null);
 
         call.enqueue(new Callback<InsertRequestResponse>() {
 
             @Override
             public void onResponse(Call<InsertRequestResponse> call, Response<InsertRequestResponse> response) {
-                Log.e(LOG_TAG,"JSON error? " + String.valueOf(response.body().getError()));
+                Log.e(LOG_TAG,"Insert Request JSON error? " + String.valueOf(response.body().getError()));
 
                 String snackbarContent;
                 if(!response.body().getError()){
@@ -131,5 +151,7 @@ public class PlaylistActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
 }

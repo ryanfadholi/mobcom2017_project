@@ -5,16 +5,32 @@ package com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures;
  */
 
 public class Song {
+    private String musicID;
     private String album;
     private String artist;
     private String title;
-    private int playtimeInMs;
+    private String genre;
 
-    public Song(String album, String artist, String title, int playtimeInMs) {
+    public Song(String musicID, String title,  String artist, String album) {
+        this.musicID = musicID;
         this.album = album;
         this.artist = artist;
         this.title = title;
-        this.playtimeInMs = playtimeInMs;
+        this.genre = null;
+        this.fixEmptyFields();
+    }
+
+    public Song(String musicID, String title,  String artist, String album, String genre) {
+        this.musicID = musicID;
+        this.album = album;
+        this.artist = artist;
+        this.title = title;
+        this.genre = genre;
+        this.fixEmptyFields();
+    }
+
+    public String getMusicID() {
+        return musicID;
     }
 
     public String getAlbum() {
@@ -25,11 +41,30 @@ public class Song {
         return artist;
     }
 
+    public String getGenre() {
+        return genre;
+    }
+
     public String getTitle() {
         return title;
     }
 
-    public int getPlaytimeInMs() {
-        return playtimeInMs;
+    private void fixEmptyFields(){
+
+        if(this.title == "" || this.title == null){
+            this.title = "Unknown";
+        }
+
+        if(this.artist == "" || this.artist == null){
+            this.artist = "Unknown Artist";
+        }
+
+        if(this.album == "" || this.album == null){
+            this.album = "Unknown Album";
+        }
+
+        if(this.genre == "" || this.genre == null){
+            this.genre = "Unknown";
+        }
     }
 }
