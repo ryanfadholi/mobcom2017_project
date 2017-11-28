@@ -25,4 +25,6 @@ public interface PlaylistService {
     @GET("request/get_request")
     Call<GetPlaylistResponse> getRequests();
 
+    @GET("request/get_request?played=0")
+    Call<GetPlaylistResponse> getUnplayedRequest();
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
 
 import java.util.ArrayList;
@@ -75,6 +77,18 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
 
         holder.title.setText(songs.get(position).getTitle());
         holder.artist.setText(songs.get(position).getArtist());
+
+        String imageBytes = songs.get(position).getBase64Img();
+        if (imageBytes.contains("null")) imageBytes = null;
+
+        if (imageBytes != null) {
+            byte[] imageByteArray = Base64.decode(imageBytes, Base64.DEFAULT);
+
+            Glide.with(context)
+                    .load(imageByteArray)
+                    .asBitmap()
+                    .into(holder.cover);
+        }
 
         if(songs.get(position).getMusicID().equals(listener.getSelectedSongID())){
             holder.title.setTypeface(boldTypeface);
