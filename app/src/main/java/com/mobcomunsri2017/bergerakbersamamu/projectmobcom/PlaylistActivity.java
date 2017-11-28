@@ -27,6 +27,7 @@ public class PlaylistActivity extends AppCompatActivity {
 
     public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mpcafe/";
 //    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mpcafe/";
+//    public static final String BASE_WEB_SERVICE_URL = "http://10.102.224.74/mpcafe/";
 
     private static final String LOG_TAG = "TG.PlaylistActivity";
     public static final int REQUEST_CODE_ADD_SONG = 1;
