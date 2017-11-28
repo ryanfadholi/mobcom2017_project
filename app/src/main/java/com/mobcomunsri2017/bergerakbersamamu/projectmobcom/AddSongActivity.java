@@ -66,6 +66,8 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         Toolbar toolbar = findViewById(R.id.add_song_toolbar);
         setSupportActionBar(toolbar);
 
+        setTitle("Tracklist");
+
         addSongRecyclerView = findViewById(R.id.add_song);
         addSongRecyclerView.setHasFixedSize(true);
         addSongAdapter = new AddSongAdapter(this, songs, this);
