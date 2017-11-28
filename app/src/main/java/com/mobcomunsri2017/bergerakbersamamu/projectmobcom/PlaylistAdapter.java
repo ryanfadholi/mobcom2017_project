@@ -1,7 +1,9 @@
 package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 
+import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Request;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
 
@@ -27,17 +30,22 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
     List<Song> songs;
     List<Request> requests;
     boolean inAddSong = false;
+    Context context;
 
 //    public PlaylistAdapter(List<Song> songs) {
 //        this.songs = songs;
 //    }
 
-    public PlaylistAdapter(List<Song> songs, boolean inAddSong) {
+    public PlaylistAdapter(Context context, List<Song> songs, boolean inAddSong) {
         this.songs = songs;
         this.inAddSong = inAddSong;
+        this.context = context;
     }
 
-    public PlaylistAdapter(List<Request> requests) {this.requests = requests;}
+    public PlaylistAdapter(Context context, List<Request> requests) {
+        this.requests = requests;
+        this.context = context;
+    }
 
     @Override
     public SongViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -57,6 +65,18 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
     public void onBindViewHolder(SongViewHolder holder, int position) {
         holder.title.setText(requests.get(position).getTitle());
         holder.artist.setText(requests.get(position).getArtist());
+
+        String imageBytes = requests.get(position).getBase64Img();
+        if (imageBytes.contains("null")) imageBytes = null;
+
+        if (imageBytes != null) {
+            byte[] imageByteArray = Base64.decode(imageBytes, Base64.DEFAULT);
+
+            Glide.with(context)
+                    .load(imageByteArray)
+                    .asBitmap()
+                    .into(holder.cover);
+        }
     }
 
     @Override

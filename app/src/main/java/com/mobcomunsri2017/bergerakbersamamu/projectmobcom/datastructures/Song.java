@@ -10,6 +10,7 @@ public class Song {
     private String artist;
     private String title;
     private String genre;
+    private String base64Img;
 
     public Song(String musicID, String title,  String artist, String album) {
         this.musicID = musicID;
@@ -26,6 +27,16 @@ public class Song {
         this.artist = artist;
         this.title = title;
         this.genre = genre;
+        this.fixEmptyFields();
+    }
+
+    public Song(String musicID, String title,  String artist, String album, String genre, String img) {
+        this.musicID = musicID;
+        this.album = album;
+        this.artist = artist;
+        this.title = title;
+        this.genre = genre;
+        this.base64Img = img;
         this.fixEmptyFields();
     }
 
@@ -49,6 +60,10 @@ public class Song {
         return title;
     }
 
+    public String getBase64Img() {
+        return base64Img;
+    }
+
     private void fixEmptyFields(){
 
         if(this.title == "" || this.title == null){
@@ -65,6 +80,10 @@ public class Song {
 
         if(this.genre == "" || this.genre == null){
             this.genre = "Unknown";
+        }
+
+        if (this.base64Img == "") {
+            this.base64Img = null;
         }
     }
 }

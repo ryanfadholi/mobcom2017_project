@@ -54,9 +54,10 @@ public class GetPlaylistResponse {
             String artist       = request.get("artist").asText();
             String album        = request.get("album").asText();
             String genre        = request.get("genre").asText();
+            String base64Img    = request.get("base64img").asText();
 
             result.add(new Request(requestID, musicID, Integer.parseInt(played), Integer.parseInt(priority),
-                    schedule, createdAt, updatedAt, title, artist, album, genre));
+                    schedule, createdAt, updatedAt, title, artist, album, genre, base64Img));
         }
 
         Log.e(LOG_TAG,"Requests: " + String.valueOf(result.size()));

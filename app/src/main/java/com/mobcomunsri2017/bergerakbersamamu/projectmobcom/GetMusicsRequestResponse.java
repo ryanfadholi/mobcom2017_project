@@ -50,9 +50,10 @@ public class GetMusicsRequestResponse {
             String currentArtist = music.get("artist").asText();
             String currentTitle = music.get("title").asText();
             String currentGenre = music.get("genre").asText();
+            String currentImg = music.get("base64img").asText();
 
             Song currentSong = new Song(currentMusicID, currentTitle,
-                    currentArtist, currentAlbum, currentGenre);
+                    currentArtist, currentAlbum, currentGenre, currentImg);
 
             result.add(currentSong);
         }
