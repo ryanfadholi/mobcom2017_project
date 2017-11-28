@@ -5,10 +5,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">#d0c1e8</item>
         <item name="colorPrimaryDark">#9f91b6</item>
-        <item name="colorPrimaryLight">#fff4ff</item>
         <item name="colorAccent">#c0c9e8</item>
-        <item name="colorAccentDark">#f3fcff</item>
-        <item name="colorAccentLight">#8f98b6</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

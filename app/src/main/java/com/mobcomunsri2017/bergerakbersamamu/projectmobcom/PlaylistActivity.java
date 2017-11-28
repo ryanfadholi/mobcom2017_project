@@ -22,6 +22,8 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Request;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetPlaylistResponse;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.InsertRequestResponse;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -29,8 +31,8 @@ import java.util.TimerTask;
 
 public class PlaylistActivity extends AppCompatActivity {
 
-    public static final String BASE_WEB_SERVICE_URL = "http://192.168.43.144/mpcafe/"; // azhary
-//    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mpcafe/";
+//    public static final String BASE_WEB_SERVICE_URL = "http://192.168.43.144/mpcafe/"; // azhary
+    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mpcafe/"; //ryan ganteng
 //    public static final String BASE_WEB_SERVICE_URL = "http://10.102.227.131/mpcafe/";
 
     private static final String LOG_TAG = "TG.PlaylistActivity";
@@ -107,6 +109,10 @@ public class PlaylistActivity extends AppCompatActivity {
                 Log.e(LOG_TAG,"Error! " + t.toString());
             }
         });
+    }
+
+    private void fetchCurrentlyPlaying(){
+
     }
 
     @Override

@@ -21,9 +21,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetMusicsRequestResponse;
 
 import java.util.ArrayList;
 import java.util.List;
