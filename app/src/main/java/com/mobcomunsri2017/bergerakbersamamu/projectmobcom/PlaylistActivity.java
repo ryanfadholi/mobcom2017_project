@@ -22,8 +22,6 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Request;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
-import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetPlaylistResponse;
-import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.InsertRequestResponse;
 
 import java.util.ArrayList;
 import java.util.Timer;

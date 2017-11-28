@@ -1,9 +1,5 @@
 package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 
-import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetMusicsRequestResponse;
-import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetPlaylistResponse;
-import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.InsertRequestResponse;
-
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -27,5 +23,5 @@ public interface PlaylistService {
 
     @GET("request/get_request?played=0")
     Call<GetPlaylistResponse> getUnplayedRequest();
-    
+
 }
