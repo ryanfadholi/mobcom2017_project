@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,9 +16,11 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
@@ -46,14 +50,23 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
     private List<Song> songList;
     private SearchView searchView;
 
+    //For bottom sheet purposes
+    private View mBottomSheetPadding;
+    private TextView mBottomSheetText;
+    private BottomSheetBehavior mBottomSheetBehavior;
+    private FloatingActionButton mAddSongFab;
+
+    //To store the selected song in the AddSongAdapter;
+    private String selectedSongID = "0";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_song);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.add_song_toolbar);
+        Toolbar toolbar = findViewById(R.id.add_song_toolbar);
         setSupportActionBar(toolbar);
 
-        addSongRecyclerView = (RecyclerView)findViewById(R.id.add_song);
+        addSongRecyclerView = findViewById(R.id.add_song);
         addSongRecyclerView.setHasFixedSize(true);
         addSongAdapter = new AddSongAdapter(this, songs, this);
 
@@ -63,12 +76,75 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         addSongRecyclerView.setAdapter(addSongAdapter);
         addSongRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        //Set bottom sheet things
+        mBottomSheetPadding = findViewById(R.id.sheetPadding);
+
+        mBottomSheetText = findViewById(R.id.addsong_bottom_sheet_text);
+        mBottomSheetText.setText("");
+
+        mAddSongFab = findViewById(R.id.addsong_fab);
+        mAddSongFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startRequestSong(selectedSongID);
+            }
+        });
+
+        View bottomSheet = findViewById( R.id.bottom_sheet );
+        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
         fetchSongs();
 
-        //Set bottom sheet listener
-        View bottomSheet = findViewById( R.id.bottom_sheet );
-        BottomSheetBehavior mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+
+
+    }
+
+    private void showBottomSheet(Song chosenSong){
+        Log.e(LOG_TAG, "Show Step 1");
+
+        if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED){
+            mBottomSheetText.setText(chosenSong.getTitle() + " - " + chosenSong.getArtist());
+            return;
+        }
+
+        Log.e(LOG_TAG, "Show Step 2");
+        //Show the bottom sheet
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        mBottomSheetBehavior.setHideable(false);
+
+        Log.e(LOG_TAG, "Show Step 3");
+        //Handle floating action button animations
+        CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) mAddSongFab.getLayoutParams();
+        p.gravity = Gravity.NO_GRAVITY;
+        p.anchorGravity = Gravity.TOP | Gravity.END;
+        p.setAnchorId(R.id.bottom_sheet);
+        mAddSongFab.setLayoutParams(p);
+        mAddSongFab.show();
+
+        Log.e(LOG_TAG, "Show Step 4");
+
+        mBottomSheetText.setText(chosenSong.getTitle() + " - " + chosenSong.getArtist());
+    }
+
+    private void hideBottomSheet(){
+
+        Log.e(LOG_TAG, "Hide Step 1");
+
+        Log.e(LOG_TAG, "Hide Step 2");
+        //Hide the bottom sheet
+        mBottomSheetBehavior.setHideable(true);
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+
+        Log.e(LOG_TAG, "Hide Step 3");
+        //Handle floating action button animations
+        CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) mAddSongFab.getLayoutParams();
+        p.gravity = Gravity.BOTTOM | Gravity.END;
+        p.setAnchorId(View.NO_ID);
+        mAddSongFab.setLayoutParams(p);
+        mAddSongFab.hide();
+
 
     }
 
@@ -194,9 +270,28 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         }
     }
 
+    //----------------------------------------------------------------
+    //START ADDSONGADAPTER LISTENER IMPLEMENTATION
     @Override
     public void onSongSelected(Song song) {
-        Toast.makeText(getApplicationContext(), "Selected: " + song.getTitle() + ", " + song.getArtist(), Toast.LENGTH_LONG).show();
-        startRequestSong(song.getMusicID());
+        String newSelectedSong = song.getMusicID();
+
+        //If user selects the same song ID, assume they want to cancel it.
+        if(selectedSongID.equals(newSelectedSong)){
+            this.selectedSongID = "0";
+            hideBottomSheet();
+        //else show it!
+        } else {
+            this.selectedSongID = song.getMusicID();
+            showBottomSheet(song);
+        }
     }
+
+    @Override
+    public String getSelectedSongID() {
+        return this.selectedSongID;
+    }
+
+    //END ADDSONGADAPTER LISTENER IMPLEMENTATION
+    //----------------------------------------------------------------
 }

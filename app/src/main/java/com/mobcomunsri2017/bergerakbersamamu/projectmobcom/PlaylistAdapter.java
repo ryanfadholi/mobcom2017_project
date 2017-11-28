@@ -74,7 +74,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
         ImageView cover;
         TextView title;
         TextView artist;
-        Button addBtn;
         ImageView upvoteBtn;
         ImageView downvoteBtn;
         boolean upvoted;
@@ -87,7 +86,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
             artist = (TextView) itemView.findViewById(R.id.artist);
             upvoteBtn = (ImageView) itemView.findViewById(R.id.upvote);
             downvoteBtn = (ImageView) itemView.findViewById(R.id.downvote);
-            addBtn = (Button) itemView.findViewById(R.id.button_add_song);
 
             upvoted = false;
             downvoted = false;
