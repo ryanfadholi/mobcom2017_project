@@ -30,7 +30,8 @@
         app:layout_anchor="@id/bottom_sheet"
         app:layout_anchorGravity="top|end"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email"
+        android:src="@drawable/ic_check_black_24dp"
+        android:tint="@android:color/white"
         android:visibility="invisible"/>
 
     <LinearLayout

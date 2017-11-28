@@ -67,7 +67,7 @@ public class PlaylistActivity extends AppCompatActivity {
             }
         });
 
-        // set interval 5 second with delay 1 seconds
+        // set interval 5 seconds with delay 1 second
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
