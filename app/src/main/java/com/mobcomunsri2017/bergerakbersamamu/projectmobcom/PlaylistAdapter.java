@@ -105,10 +105,10 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
 
                         snackbarText = "Upvoted " + title.getText();
                         ((ImageView) v).setColorFilter(itemView.getResources().getColor(R.color.upvote_green));
+
                     } else {
                         snackbarText = title.getText() + " vote cancelled";
                         ((ImageView) v).setColorFilter(itemView.getResources().getColor(R.color.default_gray));
-
                     }
 
                     Snackbar.make(v, snackbarText, Snackbar.LENGTH_SHORT).show();
@@ -131,7 +131,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
                     } else {
                         snackbarText = title.getText() + " vote cancelled";
                         ((ImageView) v).setColorFilter(itemView.getResources().getColor(R.color.default_gray));
-
                     }
 
                     Snackbar.make(v, snackbarText, Snackbar.LENGTH_SHORT).show();
