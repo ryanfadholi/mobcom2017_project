@@ -21,4 +21,5 @@ public interface PlaylistService {
 
     @GET("musics/get_musics")
     Call<GetMusicsRequestResponse> getMusics();
+
 }

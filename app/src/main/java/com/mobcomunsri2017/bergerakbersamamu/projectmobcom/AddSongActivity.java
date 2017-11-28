@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -51,12 +52,6 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         Toolbar toolbar = (Toolbar) findViewById(R.id.add_song_toolbar);
         setSupportActionBar(toolbar);
 
-//        CollapsingToolbarLayout collapsingToolbar =
-//                (CollapsingToolbarLayout) findViewById(R.id.add_song_collapsing_toolbar);
-//        collapsingToolbar.setTitle("Add Song To Playlist");
-
-        //this.initPlaylist();
-
         addSongRecyclerView = (RecyclerView)findViewById(R.id.add_song);
         addSongRecyclerView.setHasFixedSize(true);
         addSongAdapter = new AddSongAdapter(this, songs, this);
@@ -68,6 +63,11 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         addSongRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         fetchSongs();
+
+        //Set bottom sheet listener
+        View bottomSheet = findViewById( R.id.bottom_sheet );
+        BottomSheetBehavior mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
     }
 
