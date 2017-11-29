@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mobcom2017.iml" filepath="$PROJECT_DIR$/mobcom2017.iml" />
       <module fileurl="file://C:\dp\mobcom2017_project\mobcom2017.iml" filepath="C:\dp\mobcom2017_project\mobcom2017.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mobcom2017_project.iml" filepath="$PROJECT_DIR$/mobcom2017_project.iml" />
       <module fileurl="file://C:\Users\acer\AndroidStudioProjects\mobcom2017\mobcom2017_project.iml" filepath="C:\Users\acer\AndroidStudioProjects\mobcom2017\mobcom2017_project.iml" />
     </modules>
   </component>

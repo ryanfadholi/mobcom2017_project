@@ -2,6 +2,7 @@ package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
@@ -22,6 +23,12 @@ import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.mobcomunsri2017.bergerakbersamamu.projectmobcom.PlaylistActivity.service;
+
 /**
  * Created by Mifta on 11/15/2017.
  */
@@ -35,6 +42,7 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
 
     public class SongViewHolder extends RecyclerView.ViewHolder {
 
+        String musicId;
         CardView parent;
         ImageView cover;
         TextView title;
@@ -51,6 +59,7 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
         int upColorCode;
         int downColorCode;
 
+        SongViewHolder instance;
         int itemSelectedColorCode;
         int itemUnselectedColorCode;
 
@@ -63,6 +72,11 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
             counter = itemView.findViewById(R.id.song_vote_count);
             upvote = itemView.findViewById(R.id.song_upvote);
             downvote = itemView.findViewById(R.id.song_downvote);
+
+            title.setSelected(true);
+            artist.setSelected(true);
+
+            instance = this;
 
             upvoted = false;
             downvoted = false;
@@ -95,7 +109,8 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
                         voteCounter = 0;
                     }
 
-                    updateCounter();
+                    attemptVote(instance, musicId, "1");
+//                    updateCounter(musicId);
                     Snackbar.make(v, snackbarText, Snackbar.LENGTH_SHORT).show();
                 }
             });
@@ -120,7 +135,8 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
                         voteCounter = 0;
                     }
 
-                    updateCounter();
+                    attemptVote(instance, musicId, "0");
+//                    updateCounter(musicId);
                     Snackbar.make(v, snackbarText, Snackbar.LENGTH_SHORT).show();
                 }
             });
@@ -137,20 +153,64 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
 
         }
 
-        public void updateCounter(){
-            String counterText = String.valueOf(voteCounter);
+        public void checkVotes(String musics_id) {
+            String device_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+            PlaylistActivity.checkService();
+            Call<GetVoteResponse> call = service.checkVotes(musics_id, device_id);
+            call.enqueue(new Callback<GetVoteResponse>() {
+                @Override
+                public void onResponse(Call<GetVoteResponse> call, Response<GetVoteResponse> response) {
+                    Log.e(LOG_TAG,"Check Votes JSON error? " + String.valueOf(response.body().getError()));
+                    int type = response.body().checkVotes();
+                    if (type == 1) {
+                        upvoted = true;
+                        downvoted = false;
+                        upvote.setColorFilter(upColorCode);
+                        downvote.setColorFilter(defaultColorCode);
+                    } else if (type == 0) {
+                        upvoted = false;
+                        downvoted = true;
+                        upvote.setColorFilter(defaultColorCode);
+                        downvote.setColorFilter(downColorCode);
+                    }
+                }
 
-            if(voteCounter > 0){
-                counterText = "+" + counterText;
-                counter.setTextColor(upColorCode);
-            } else if(voteCounter < 0){
-                counter.setTextColor(downColorCode);
-            } else {
-                counter.setTextColor(defaultColorCode);
-            }
+                @Override
+                public void onFailure(Call<GetVoteResponse> call, Throwable t) {
+                    Log.e(LOG_TAG,"Error! " + t.toString());
+                }
+            });
+        }
 
-            counter.setText(counterText);
+        public void updateCounter(String musics_id){
+            PlaylistActivity.checkService();
+            Call<GetCountVoteResponse> call = service.getVotes(musics_id);
+            call.enqueue(new Callback<GetCountVoteResponse>() {
 
+                @Override
+                public void onResponse(Call<GetCountVoteResponse> call, Response<GetCountVoteResponse> response) {
+                    Log.e(LOG_TAG,"Update Counter JSON error? " + String.valueOf(response.body().getError()));
+                    voteCounter = response.body().getVotes();
+                    String counterText = String.valueOf(voteCounter);
+
+                    if(voteCounter > 0){
+                        counterText = "+" + counterText;
+                        counter.setTextColor(upColorCode);
+                    } else if(voteCounter < 0){
+                        counter.setTextColor(downColorCode);
+                    } else {
+                        counter.setTextColor(defaultColorCode);
+                    }
+
+                    counter.setText(counterText);
+                    Log.e(LOG_TAG, "SET TEXT: " + counterText);
+                }
+
+                @Override
+                public void onFailure(Call<GetCountVoteResponse> call, Throwable t) {
+                    Log.e(LOG_TAG,"Error! " + t.toString());
+                }
+            });
         }
     }
 
@@ -176,6 +236,10 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
 
         holder.title.setText(songs.get(position).getTitle());
         holder.artist.setText(songs.get(position).getArtist());
+        holder.musicId = songs.get(position).getMusicID();
+
+        holder.updateCounter(holder.musicId);
+        holder.checkVotes(holder.musicId);
 
         String imageBytes = songs.get(position).getBase64Img();
         if (imageBytes.contains("null")) imageBytes = null;
@@ -198,10 +262,6 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
             holder.title.setTypeface(normalTypeface);
             holder.artist.setTypeface(normalTypeface);
         }
-//        Glide.with(context)
-//                .load(song.getImage())
-//                .apply(RequestOptions.circleCropTransform())
-//                .into(holder.thumbnail);
     }
 
     @Override
@@ -222,6 +282,35 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
     public interface AddSongAdapterListener {
         void onSongSelected(Song song);
         String getSelectedSongID();
+    }
+
+    private void attemptVote(final SongViewHolder svh, final String musics_id, String type) {
+        String device_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        Call<InsertVoteResponse> call = service.setVote(musics_id, type, device_id);
+        call.enqueue(new Callback<InsertVoteResponse>() {
+
+            @Override
+            public void onResponse(Call<InsertVoteResponse> call, Response<InsertVoteResponse> response) {
+                Log.e(LOG_TAG,"Insert Request JSON error? " + String.valueOf(response.body().getError()));
+                svh.updateCounter(musics_id);
+//                String snackbarContent;
+//                if(!response.body().getError()){
+//                    snackbarContent = "Song requested successfully";
+//                } else {
+//                    snackbarContent = "Failed to request song";
+//                    Log.e(LOG_TAG,response.body().getError_message());
+//                }
+//
+//                Snackbar.make(view, snackbarContent, Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+
+            }
+
+            @Override
+            public void onFailure(Call<InsertVoteResponse> call, Throwable t) {
+                Log.e(LOG_TAG,"Error! " + t.toString());
+            }
+        });
     }
 
 }
