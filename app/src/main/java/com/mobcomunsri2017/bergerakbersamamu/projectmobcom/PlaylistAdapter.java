@@ -27,6 +27,8 @@ import java.util.List;
 
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongViewHolder> {
 
+    public static String LOG_TAG = "TG.PlaylistAdapter";
+
     List<Song> songs;
     List<Request> requests;
     boolean inAddSong = false;
@@ -67,6 +69,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
         holder.artist.setText(requests.get(position).getArtist());
 
         String imageBytes = requests.get(position).getBase64Img();
+
         if (imageBytes.contains("null")) imageBytes = null;
 
         if (imageBytes != null) {
@@ -76,6 +79,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
                     .load(imageByteArray)
                     .asBitmap()
                     .into(holder.cover);
+        } else {
+
         }
     }
 

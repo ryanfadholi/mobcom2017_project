@@ -241,6 +241,11 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
         holder.updateCounter(holder.musicId);
         holder.checkVotes(holder.musicId);
 
+        Log.e(LOG_TAG, songs.get(position).getTitle() + ", " + songs.get(position).getBase64Img());
+        Glide.with(holder.itemView.getContext())
+                .load(R.drawable.p200x200)
+                .into(holder.cover);
+
         String imageBytes = songs.get(position).getBase64Img();
         if (imageBytes.contains("null")) imageBytes = null;
 
