@@ -1,5 +1,7 @@
 package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -24,4 +26,6 @@ public interface PlaylistService {
     @GET("request/get_request?played=0")
     Call<GetPlaylistResponse> getUnplayedRequest();
 
+    @GET("player/get_currently_playing")
+    Call<JsonNode> getCurrentlyPlaying();
 }

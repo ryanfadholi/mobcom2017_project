@@ -72,7 +72,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
         if (imageBytes != null) {
             byte[] imageByteArray = Base64.decode(imageBytes, Base64.DEFAULT);
 
-            Glide.with(context)
+            Glide.with(holder.itemView.getContext())
                     .load(imageByteArray)
                     .asBitmap()
                     .into(holder.cover);
