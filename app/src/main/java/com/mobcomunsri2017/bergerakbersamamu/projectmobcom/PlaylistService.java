@@ -18,6 +18,21 @@ public interface PlaylistService {
                                             @Field("priority") String priority,
                                             @Field("schedule") String schedule);
 
+    @FormUrlEncoded
+    @POST("votes/set_votes")
+    Call<InsertVoteResponse> setVote(@Field("musics_id") String musics_id,
+                                     @Field("type") String type,
+                                     @Field("device_id") String device_id);
+
+    @FormUrlEncoded
+    @POST("votes/count_votes")
+    Call<GetCountVoteResponse> getVotes(@Field("musics_id") String musics_id);
+
+    @FormUrlEncoded
+    @POST("votes/check_votes")
+    Call<GetVoteResponse> checkVotes(@Field("musics_id") String musics_id,
+                                     @Field("device_id") String device_id);
+
     @GET("musics/get_musics")
     Call<GetMusicsRequestResponse> getMusics();
 

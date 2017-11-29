@@ -24,7 +24,7 @@
 
         <LinearLayout
             android:id="@+id/song_description"
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@id/song_cover"
@@ -32,16 +32,22 @@
 
             <TextView
                 android:id="@+id/song_title"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Judul Lagu"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:marqueeRepeatLimit="marquee_forever"
                 android:textSize="20dp" />
 
             <TextView
                 android:id="@+id/song_artist"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Artist"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:marqueeRepeatLimit="marquee_forever"
                 android:textSize="12dp" />
 
         </LinearLayout>
