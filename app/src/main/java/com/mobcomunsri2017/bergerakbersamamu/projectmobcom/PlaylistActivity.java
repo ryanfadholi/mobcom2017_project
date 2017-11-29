@@ -3,6 +3,7 @@ package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -12,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -20,6 +22,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Request;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
 
@@ -42,6 +45,9 @@ public class PlaylistActivity extends AppCompatActivity {
     private ArrayList<Song> songs = new ArrayList<>();
     private ArrayList<Request> requests = new ArrayList<>();
 
+    private TextView nowPlayingTitle;
+    private TextView nowPlayingDetails;
+
     private Context mContext;
 
     @Override
@@ -51,13 +57,31 @@ public class PlaylistActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.playlist_toolbar);
         setSupportActionBar(toolbar);
 
-        mContext = this;
-
-        CollapsingToolbarLayout collapsingToolbar =
+        final CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.playlist_collapsing_toolbar);
-        collapsingToolbar.setTitle("Music Player");
+        collapsingToolbar.setTitle(" ");
+        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.playlist_appbar);
+        appBarLayout.setExpanded(true);
+        // hiding & showing the title when toolbar expanded & collapsed
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            boolean isShow = false;
+            int scrollRange = -1;
 
-        this.initPlaylist();
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (scrollRange == -1) {
+                    scrollRange = appBarLayout.getTotalScrollRange();
+                }
+                if (scrollRange + verticalOffset == 0) {
+                    collapsingToolbar.setTitle(getString(R.string.app_name));
+                    isShow = true;
+                } else if (isShow) {
+                    collapsingToolbar.setTitle(" ");
+                    isShow = false;
+                }
+            }
+        });
+        mContext = this;
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.playlist_fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -67,10 +91,17 @@ public class PlaylistActivity extends AppCompatActivity {
             }
         });
 
-        // set interval 5 seconds with delay 1 second
+        //Initialize views
+        nowPlayingTitle = findViewById(R.id.nowplaying_title);
+        nowPlayingTitle = findViewById(R.id.nowplaying_detail);
+
+        //Retrieve Data
+        this.initPlaylist();
+
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
+                //fetchCurrentlyPlaying();
                 fetchRequests();
             }
         }, 1000, 5000);
@@ -110,7 +141,37 @@ public class PlaylistActivity extends AppCompatActivity {
     }
 
     private void fetchCurrentlyPlaying(){
+        PlaylistActivity.checkService();
+        Call<JsonNode> call = service.getCurrentlyPlaying();
 
+        call.enqueue(new Callback<JsonNode>() {
+            @Override
+            public void onResponse(Call<JsonNode> call, Response<JsonNode> response) {
+                Log.e(LOG_TAG, "welp, this is actually called!");
+
+                Log.e(LOG_TAG, "json: " + response.body().toString());
+//                if (response.body().isError()) {
+//                    nowPlayingTitle.setText("Uh-Oh!");
+//                    nowPlayingDetails.setText("We experienced some problems. Please try again.");
+//
+//                    Log.e(LOG_TAG, response.body().getErrorMessage());
+//                    return;
+//                }
+//
+//                Log.e(LOG_TAG, "Wadooooo");
+//
+//                Log.e(LOG_TAG, response.body().toString());
+//
+//                response.body().getCurrentSong();
+
+//                nowPlayingDetails.setText(currentSong.getTitle() + " | " + currentSong.getArtist());
+            }
+
+            @Override
+            public void onFailure(Call<JsonNode> call, Throwable t) {
+                Log.e(LOG_TAG, t.toString());
+            }
+        });
     }
 
     @Override

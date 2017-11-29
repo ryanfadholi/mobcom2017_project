@@ -2,11 +2,13 @@
 <resources>
     <color name="colorPrimary">#d0c1e8</color>
     <color name="colorPrimaryDark">#9f91b6</color>
-    <color name="colorPrimaryLight">#fff4ff</color>
+    <color name="colorPrimaryLight">#fff3ff</color>
     <color name="colorAccent">#c0c9e8</color>
-    <color name="colorAccentDark">#f3fcff</color>
-    <color name="colorAccentLight">#8f98b6</color>
+    <color name="colorAccentLight">#f3fcff</color>
+    <color name="colorAccentDark">#8f98b6</color>
     <color name="default_gray">#9E9E9E</color>
-    <color name="upvote_green">#64DD17</color>
+    <color name="upvote_green">#1E841E</color>
     <color name="downvote_red">#F44336</color>
+    <color name="style_default_color">#000000</color>
+    <color name="activity_background">#E1E2E1</color>
 </resources>

@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
@@ -42,6 +43,7 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
     public class SongViewHolder extends RecyclerView.ViewHolder {
 
         String musicId;
+        CardView parent;
         ImageView cover;
         TextView title;
         TextView artist;
@@ -58,9 +60,12 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
         int downColorCode;
 
         SongViewHolder instance;
+        int itemSelectedColorCode;
+        int itemUnselectedColorCode;
 
         public SongViewHolder(final View itemView) {
             super(itemView);
+            parent = itemView.findViewById(R.id.add_song_item);
             cover = itemView.findViewById(R.id.song_cover);
             title = itemView.findViewById(R.id.song_title);
             artist = itemView.findViewById(R.id.song_artist);
@@ -79,6 +84,9 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
             defaultColorCode = itemView.getResources().getColor(R.color.default_gray);
             upColorCode = itemView.getResources().getColor(R.color.upvote_green);
             downColorCode = itemView.getResources().getColor(R.color.downvote_red);
+
+            itemSelectedColorCode = itemView.getResources().getColor(R.color.colorAccent);
+            itemUnselectedColorCode = itemView.getResources().getColor(android.R.color.white);
 
             upvote.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -239,16 +247,18 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
         if (imageBytes != null) {
             byte[] imageByteArray = Base64.decode(imageBytes, Base64.DEFAULT);
 
-            Glide.with(context)
+            Glide.with(holder.itemView.getContext())
                     .load(imageByteArray)
                     .asBitmap()
                     .into(holder.cover);
         }
 
         if(songs.get(position).getMusicID().equals(listener.getSelectedSongID())){
+//            holder.parent.setCardBackgroundColor(holder.itemSelectedColorCode);
             holder.title.setTypeface(boldTypeface);
             holder.artist.setTypeface(boldTypeface);
         } else {
+//            holder.parent.setCardBackgroundColor(holder.itemUnselectedColorCode);
             holder.title.setTypeface(normalTypeface);
             holder.artist.setTypeface(normalTypeface);
         }
