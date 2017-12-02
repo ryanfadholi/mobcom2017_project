@@ -7,14 +7,14 @@ import com.fasterxml.jackson.databind.JsonNode;
  * Created by Azhary Arliansyah on 29/11/2017.
  */
 
-public class GetVoteResponse {
+public class GetUserVoteResponse {
     private boolean error;
     private String error_message;
     private JsonNode data;
 
-    public GetVoteResponse(@JsonProperty("error") boolean error,
-                           @JsonProperty("error_message") String error_message,
-                           @JsonProperty("data") JsonNode data) {
+    public GetUserVoteResponse(@JsonProperty("error") boolean error,
+                               @JsonProperty("error_message") String error_message,
+                               @JsonProperty("data") JsonNode data) {
         this.error = error;
         this.error_message = error_message;
         this.data = data;

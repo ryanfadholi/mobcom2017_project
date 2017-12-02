@@ -26,14 +26,21 @@ public interface PlaylistService {
                                      @Field("type") String type,
                                      @Field("device_id") String device_id);
 
+    @GET("votes/count_all_votes")
+    Call<GetCountAllVotesResponse> getAllVotes();
+
     @FormUrlEncoded
     @POST("votes/count_votes")
     Call<GetCountVoteResponse> getVotes(@Field("musics_id") String musics_id);
 
     @FormUrlEncoded
+    @POST("votes/check_all_votes")
+    Call<GetUserAllVotesResponse> chcekAllUserVotes(@Field("device_id") String device_id);
+
+    @FormUrlEncoded
     @POST("votes/check_votes")
-    Call<GetVoteResponse> checkVotes(@Field("musics_id") String musics_id,
-                                     @Field("device_id") String device_id);
+    Call<GetUserVoteResponse> checkUserVote(@Field("musics_id") String musics_id,
+                                            @Field("device_id") String device_id);
 
     @GET("musics/get_musics")
     Call<GetMusicsRequestResponse> getMusics();

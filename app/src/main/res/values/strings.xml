@@ -5,4 +5,5 @@
     <string name="action_search">Find Song</string>
     <string name="search_products">search song</string>
     <string name="search_hint">Type title…</string>
+    <string name="vote_counter_placeholder">-</string>
 </resources>

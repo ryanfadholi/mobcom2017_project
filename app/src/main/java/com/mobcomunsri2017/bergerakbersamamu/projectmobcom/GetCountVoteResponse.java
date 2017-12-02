@@ -30,21 +30,21 @@ public class GetCountVoteResponse {
         return error;
     }
 
-    public void setError(boolean error) {
-        this.error = error;
-    }
-
-    public String getError_message() {
+    public String getErrorMessage () {
         return error_message;
-    }
-
-    public void setError_message(String error_message) {
-        this.error_message = error_message;
     }
 
     public int getVotes() {
         int upvotes = data.get("upvote").asInt();
         int downvotes = data.get("downvote").asInt();
         return upvotes - downvotes;
+    }
+
+    public int getDownvotes(){
+        return data.get("downvote").asInt();
+    }
+
+    public int getUpvotes(){
+        return data.get("upvote").asInt();
     }
 }

@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -46,7 +47,13 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
 
     private RecyclerView addSongRecyclerView;
     private AddSongAdapter addSongAdapter;
+
     private ArrayList<Song> songs = new ArrayList<>();
+
+    private HashMap<String, Integer> downvotes = new HashMap<>();
+    private HashMap<String, Integer> upvotes = new HashMap<>();
+    private HashMap<String, Integer> userVotes = new HashMap<>();
+
     private List<Song> songList;
     private SearchView searchView;
 
@@ -72,9 +79,6 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         addSongRecyclerView.setHasFixedSize(true);
         addSongAdapter = new AddSongAdapter(this, songs, this);
 
-        // white background notification bar
-        whiteNotificationBar(addSongRecyclerView);
-
         addSongRecyclerView.setAdapter(addSongAdapter);
         addSongRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -96,10 +100,7 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-        fetchSongs();
-
-
-
+        fetchData();
     }
 
     private void showBottomSheet(Song chosenSong){
@@ -150,6 +151,12 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
 
     }
 
+    private void fetchData(){
+        this.fetchVotes();
+        this.fetchUserVotes();
+        this.fetchSongs();
+    }
+
     private void fetchSongs() {
 
         PlaylistActivity.checkService();
@@ -181,6 +188,60 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
             @Override
             public void onFailure(Call<GetMusicsRequestResponse> call, Throwable t) {
                 Log.e(LOG_TAG,"Error! " + t.toString());
+            }
+        });
+    }
+
+    private void fetchUserVotes(){
+        String device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        PlaylistActivity.checkService();
+        Call<GetUserAllVotesResponse> call = service.chcekAllUserVotes(device_id);
+
+        call.enqueue(new Callback<GetUserAllVotesResponse>() {
+            @Override
+            public void onResponse(Call<GetUserAllVotesResponse> call, Response<GetUserAllVotesResponse> response) {
+                Log.e(LOG_TAG,"Get User Votes JSON error? " + String.valueOf(response.body().isError()));
+
+                if(response.body().isError()) {
+                    Log.e(LOG_TAG, "Get User Votes JSON Error, " + response.body().getErrorMessage());
+                }
+
+                userVotes.clear();
+                userVotes.putAll(response.body().checkUserVotes());
+
+                Log.e(LOG_TAG,"refreshed user votes: " + userVotes.toString());
+            }
+
+            @Override
+            public void onFailure(Call<GetUserAllVotesResponse> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void fetchVotes(){
+        PlaylistActivity.checkService();
+        Call<GetCountAllVotesResponse> call = service.getAllVotes();
+
+        call.enqueue(new Callback<GetCountAllVotesResponse>() {
+            @Override
+            public void onResponse(Call<GetCountAllVotesResponse> call, Response<GetCountAllVotesResponse> response) {
+                Log.e(LOG_TAG,"Get All Votes JSON error? " + String.valueOf(response.body().isError()));
+
+                upvotes.clear();
+                upvotes.putAll(response.body().getUpvotes());
+
+                downvotes.clear();
+                downvotes.putAll(response.body().getDownvotes());
+
+                Log.e(LOG_TAG,"refreshed upvotes: " + upvotes.toString());
+                Log.e(LOG_TAG,"refreshed downvotes: " + downvotes.toString());
+            }
+
+            @Override
+            public void onFailure(Call<GetCountAllVotesResponse> call, Throwable t) {
+
             }
         });
     }
@@ -263,14 +324,6 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         super.onBackPressed();
     }
 
-    private void whiteNotificationBar(View view) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int flags = view.getSystemUiVisibility();
-            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-            view.setSystemUiVisibility(flags);
-            getWindow().setStatusBarColor(Color.WHITE);
-        }
-    }
 
     //----------------------------------------------------------------
     //START ADDSONGADAPTER LISTENER IMPLEMENTATION
@@ -292,6 +345,42 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
     @Override
     public String getSelectedSongID() {
         return this.selectedSongID;
+    }
+
+    @Override
+    public Integer getDownvoteCounter(String musicID) {
+        Integer result = this.downvotes.get(musicID);
+
+        return (result != null) ? result : 0;
+    }
+
+    @Override
+    public Integer getUpvoteCounter(String musicID) {
+        Integer result = this.upvotes.get(musicID);
+
+        return (result != null) ? result : 0;
+    }
+
+    @Override
+    public Integer getUserVoteStatus(String musicID) {
+        Integer userVote = userVotes.get(musicID);
+
+        return userVote != null ? userVote : -1;
+    }
+
+    @Override
+    public void setUserVoteStatus(String musicID, int newStatus){
+        userVotes.put(musicID, newStatus);
+    }
+
+    @Override
+    public void updateDownvoteCounter(String musicID, int value) {
+        downvotes.put(musicID, downvotes.get(musicID) + value);
+    }
+
+    @Override
+    public void updateUpvoteCounter(String musicID, int value) {
+        upvotes.put(musicID, upvotes.get(musicID) + value);
     }
 
     //END ADDSONGADAPTER LISTENER IMPLEMENTATION
