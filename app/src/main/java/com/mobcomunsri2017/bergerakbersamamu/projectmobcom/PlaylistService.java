@@ -31,7 +31,7 @@ public interface PlaylistService {
 
     @FormUrlEncoded
     @POST("votes/count_votes")
-    Call<GetCountVoteResponse> getVotes(@Field("musics_id") String musics_id);
+    Call<GetTotalVoteResponse> getVotes(@Field("musics_id") String musics_id);
 
     @FormUrlEncoded
     @POST("votes/check_all_votes")

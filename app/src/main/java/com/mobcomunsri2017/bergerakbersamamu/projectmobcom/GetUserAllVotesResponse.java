@@ -9,25 +9,16 @@ import java.util.HashMap;
  * Created by rynfd on 12/2/2017.
  */
 
-public class GetUserAllVotesResponse {
-    private boolean error;
-    private String error_message;
-    private JsonNode data;
+public class GetUserAllVotesResponse extends GetResponseTemplate {
+
+    private static String LOG_TAG = "TG.GetUserAllVotesResp";
 
     public GetUserAllVotesResponse(@JsonProperty("error") boolean error,
                                @JsonProperty("error_message") String error_message,
                                @JsonProperty("data") JsonNode data) {
         this.error = error;
-        this.error_message = error_message;
+        this.errorMessage = error_message;
         this.data = data;
-    }
-
-    public boolean isError() {
-        return error;
-    }
-
-    public String getErrorMessage() {
-        return error_message;
     }
 
     public HashMap<String, Integer> checkUserVotes() {

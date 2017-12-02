@@ -6,16 +6,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
-
-import java.util.ArrayList;
 
 /**
  * Created by rynfd on 11/29/2017.
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GetCurrentlyPlayingResponse {
+public class GetCurrentlyPlayingResponse extends GetResponseTemplate {
 
     private String LOG_TAG = "TG.GetCurrentlyPlayingResponse";
     private boolean error;
