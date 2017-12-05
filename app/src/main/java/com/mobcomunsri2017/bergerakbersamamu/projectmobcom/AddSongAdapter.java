@@ -323,6 +323,11 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
         notifyDataSetChanged();
     }
 
+    public void addItem(Song newSong){
+        this.songs.add(newSong);
+        this.notifyItemInserted(this.songs.size() - 1);
+    }
+
     public interface AddSongAdapterListener {
         void onSongSelected(Song song);
 

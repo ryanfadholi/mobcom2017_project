@@ -14,11 +14,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Request;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
 
 import org.w3c.dom.Text;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -31,36 +34,33 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
 
     List<Song> songs;
     List<Request> requests;
-    boolean inAddSong = false;
+    RequestManager glideInstance;
     Context context;
 
 //    public PlaylistAdapter(List<Song> songs) {
 //        this.songs = songs;
 //    }
 
-    public PlaylistAdapter(Context context, List<Song> songs, boolean inAddSong) {
-        this.songs = songs;
-        this.inAddSong = inAddSong;
-        this.context = context;
-    }
-
-    public PlaylistAdapter(Context context, List<Request> requests) {
+    public PlaylistAdapter(Context context, List<Request> requests, RequestManager glideInstance) {
         this.requests = requests;
         this.context = context;
+        this.glideInstance = glideInstance;
     }
 
-    @Override
     public SongViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        int itemView;
-        if (!this.inAddSong) {
-            itemView = R.layout.item_playlist;
-        } else {
-            itemView = R.layout.item_add_song;
-        }
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_playlist, parent, false);
 
-        View v = LayoutInflater.from(parent.getContext()).inflate(itemView, parent, false);
-        SongViewHolder svh = new SongViewHolder(v);
-        return svh;
+        return new SongViewHolder(v);
+    }
+
+    public void sortDataset(){
+        Collections.sort(requests, new Comparator<Request>() {
+            @Override
+            public int compare(Request o1, Request o2) {
+                return o1.getRequestID().toLowerCase().compareTo(o2.getRequestID());
+            }
+        });
     }
 
     @Override
@@ -70,16 +70,16 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
 
         String imageBytes = requests.get(position).getBase64Img();
 
-        if (imageBytes != null) {
-            byte[] imageByteArray = Base64.decode(imageBytes, Base64.DEFAULT);
+        byte[] imageByteArray = null;
+        if (imageBytes != null) imageByteArray = Base64.decode(imageBytes, Base64.DEFAULT);
 
-            Glide.with(holder.itemView.getContext())
-                    .load(imageByteArray)
-                    .asBitmap()
-                    .into(holder.cover);
-        } else {
-
-        }
+        glideInstance
+                .load(imageByteArray)
+                .asBitmap()
+                .placeholder(R.drawable.p200x200)
+                .fallback(R.drawable.p200x200)
+                .error(R.drawable.p200x200)
+                .into(holder.cover);
     }
 
     @Override
@@ -97,66 +97,12 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
         ImageView cover;
         TextView title;
         TextView artist;
-        ImageView upvoteBtn;
-        ImageView downvoteBtn;
-        boolean upvoted;
-        boolean downvoted;
 
         public SongViewHolder(final View itemView) {
             super(itemView);
             cover = (ImageView) itemView.findViewById(R.id.cover_item);
             title = (TextView) itemView.findViewById(R.id.title);
             artist = (TextView) itemView.findViewById(R.id.artist);
-            upvoteBtn = (ImageView) itemView.findViewById(R.id.upvote);
-            downvoteBtn = (ImageView) itemView.findViewById(R.id.downvote);
-
-            upvoted = false;
-            downvoted = false;
-
-            upvoteBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    upvoted = !upvoted;
-
-                    String snackbarText;
-
-                    if(upvoted){
-                        downvoted = false;
-                        downvoteBtn.setColorFilter(itemView.getResources().getColor(R.color.default_gray));
-
-                        snackbarText = "Upvoted " + title.getText();
-                        ((ImageView) v).setColorFilter(itemView.getResources().getColor(R.color.upvote_green));
-
-                    } else {
-                        snackbarText = title.getText() + " vote cancelled";
-                        ((ImageView) v).setColorFilter(itemView.getResources().getColor(R.color.default_gray));
-                    }
-
-                    Snackbar.make(v, snackbarText, Snackbar.LENGTH_SHORT).show();
-                }
-            });
-
-            downvoteBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    downvoted = !downvoted;
-
-                    String snackbarText;
-
-                    if(downvoted){
-                        upvoted = false;
-                        upvoteBtn.setColorFilter(itemView.getResources().getColor(R.color.default_gray));
-
-                        snackbarText = "Downvoted " + title.getText();
-                        ((ImageView) v).setColorFilter(itemView.getResources().getColor(R.color.downvote_red));
-                    } else {
-                        snackbarText = title.getText() + " vote cancelled";
-                        ((ImageView) v).setColorFilter(itemView.getResources().getColor(R.color.default_gray));
-                    }
-
-                    Snackbar.make(v, snackbarText, Snackbar.LENGTH_SHORT).show();
-                }
-            });
         }
     }
 

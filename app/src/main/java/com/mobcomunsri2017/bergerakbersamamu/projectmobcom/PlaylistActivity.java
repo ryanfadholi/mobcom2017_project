@@ -1,13 +1,18 @@
 package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 
+import android.animation.Animator;
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.content.ContentQueryMap;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.renderscript.Sampler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -66,12 +71,15 @@ public class PlaylistActivity extends AppCompatActivity {
 
     private Toolbar nowPlayingToolbar;
     private TextView nowPlayingTitle;
-    private TextView nowPlayingDetails;
+    private TextView nowPlayingSongTitle;
+    private TextView nowPlayingSongArtist;
     private ImageView nowPlayingCover;
     private View nowPlayingCoverGradient;
     private RelativeLayout nowPlayingToolbarLayout;
 
     private Context mContext;
+
+    private int currentToolbarColor;
 
     private NowPlayingSong nowPlaying = new NowPlayingSong("", "", "", "", "", "", "");
 
@@ -119,10 +127,19 @@ public class PlaylistActivity extends AppCompatActivity {
 
         //Initialize views
         nowPlayingTitle = findViewById(R.id.nowplaying_title);
-        nowPlayingDetails = findViewById(R.id.nowplaying_detail);
+        nowPlayingSongTitle = findViewById(R.id.nowplaying_song_title);
+        nowPlayingSongArtist = findViewById(R.id.nowplaying_song_artist);
         nowPlayingCover = findViewById(R.id.nowplaying_cover);
         nowPlayingCoverGradient = findViewById(R.id.nowplaying_gradient);
         nowPlayingToolbarLayout = findViewById(R.id.playlist_toolbar_layout);
+
+        currentToolbarColor = getResources().getColor(R.color.colorPrimary);
+
+        playlistRecyclerView = findViewById(R.id.playlist);
+        playlistAdapter = new PlaylistAdapter(mContext, requests, Glide.with(this));
+
+        playlistRecyclerView.setAdapter(playlistAdapter);
+        playlistRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
 
         //Retrieve Data
         this.initPlaylist(this);
@@ -137,56 +154,93 @@ public class PlaylistActivity extends AppCompatActivity {
         }, 1000, 5000);
     }
 
-    private void calculate
+
+
+    private void animateToolbarChange(int bgColorFrom, int bgColorTo, boolean isCoverShow){
+
+        final int coverVisibility = isCoverShow ? View.VISIBLE : View.INVISIBLE;
+
+        ValueAnimator bgAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), bgColorFrom, bgColorTo);
+        bgAnimation.setDuration(500); // milliseconds
+
+        Log.e(LOG_TAG, "Change animated!");
+
+        bgAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                nowPlayingToolbar.setBackgroundColor((int) animator.getAnimatedValue());
+                nowPlayingToolbarLayout.setBackgroundColor((int) animator.getAnimatedValue());
+            }
+
+        });
+        bgAnimation.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                nowPlayingCover.setVisibility(coverVisibility);
+                nowPlayingCoverGradient.setVisibility(coverVisibility);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        bgAnimation.start();
+    }
 
     private void adjustToolbarStyle(){
-        int defaultToolbarColor = getResources().getColor(R.color.colorPrimary);
+        final int defaultToolbarColor = getResources().getColor(R.color.colorPrimary);
         int defaultToolbarTextColor = getResources().getColor(R.color.style_default_color);
 
         boolean isCoverArtSet = false;
 
         if(nowPlaying.getBase64Img() != null) isCoverArtSet = true;
 
+        nowPlayingCover.setVisibility(View.INVISIBLE);
+        nowPlayingCoverGradient.setVisibility(View.INVISIBLE);
+
         if(isCoverArtSet){
+
             Palette.PaletteAsyncListener paletteListener = new Palette.PaletteAsyncListener() {
                 public void onGenerated(Palette palette) {
-                    int defaultColor = 0x000000;
 
                     Palette.Swatch dominantSwatch = palette.getDominantSwatch();
                     int bgColor = dominantSwatch.getRgb();
 
-                    nowPlayingToolbar.setBackgroundColor(bgColor);
-                    nowPlayingToolbarLayout.setBackgroundColor(bgColor);
-                    nowPlayingTitle.setTextColor(dominantSwatch.getTitleTextColor());
-                    nowPlayingDetails.setTextColor(dominantSwatch.getBodyTextColor());
-
                     GradientDrawable drawable = new GradientDrawable(
                             GradientDrawable.Orientation.LEFT_RIGHT,
                             new int[] { bgColor, ColorUtils.setAlphaComponent(bgColor, 0)}
-                            );
-
+                    );
                     nowPlayingCoverGradient.setBackground(drawable);
 
+                    animateToolbarChange(currentToolbarColor, bgColor, true);
+                    currentToolbarColor = bgColor;
 
-                }
-            };
+                    nowPlayingTitle.setTextColor(dominantSwatch.getTitleTextColor());
+                    nowPlayingSongTitle.setTextColor(dominantSwatch.getBodyTextColor());
+                    nowPlayingSongArtist.setTextColor(dominantSwatch.getBodyTextColor());
+                }};
 
             byte[] coverArtByte = Base64.decode(nowPlaying.getBase64Img(), Base64.DEFAULT);
             Bitmap coverArt = BitmapFactory.decodeByteArray(coverArtByte, 0, coverArtByte.length);
             Palette.from(coverArt).generate(paletteListener);
 
             Glide.with(this).load(coverArtByte).asBitmap().into(nowPlayingCover);
-            nowPlayingCover.setVisibility(View.VISIBLE);
-            nowPlayingCoverGradient.setVisibility(View.VISIBLE);
-
         } else {
-            nowPlayingCover.setVisibility(View.INVISIBLE);
-            nowPlayingCoverGradient.setVisibility(View.INVISIBLE);
 
-            this.nowPlayingToolbar.setBackgroundColor(defaultToolbarColor);
-            this.nowPlayingToolbarLayout.setBackgroundColor(defaultToolbarColor);
+            animateToolbarChange(currentToolbarColor, defaultToolbarColor, false);
             this.nowPlayingTitle.setTextColor(defaultToolbarTextColor);
-            this.nowPlayingDetails.setTextColor(defaultToolbarTextColor);
+            this.nowPlayingSongTitle.setTextColor(defaultToolbarTextColor);
+            this.nowPlayingSongArtist.setTextColor(defaultToolbarTextColor);
         }
     }
 
@@ -209,11 +263,10 @@ public class PlaylistActivity extends AppCompatActivity {
 
                 requests.clear();
                 requests.addAll(response.body().getRequests());
-                playlistRecyclerView = (RecyclerView)findViewById(R.id.playlist);
-                playlistRecyclerView.setHasFixedSize(true);
-                playlistAdapter = new PlaylistAdapter(mContext, requests);
-                playlistRecyclerView.setAdapter(playlistAdapter);
-                playlistRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+
+                playlistAdapter.sortDataset();
+                playlistAdapter.notifyDataSetChanged();
+
             }
 
             @Override
@@ -255,12 +308,17 @@ public class PlaylistActivity extends AppCompatActivity {
     }
 
     private void updateNowPlayingText(){
-        this.nowPlayingDetails.setText(nowPlaying.getTitle() + " - " + nowPlaying.getArtist());
+        this.nowPlayingSongTitle.setText(nowPlaying.getTitle());
+        this.nowPlayingSongArtist.setText(nowPlaying.getArtist());
     }
 
     @Override
     protected void onResume() {
         checkService(this);
+        playlistAdapter = new PlaylistAdapter(mContext, requests, Glide.with(this));
+
+        playlistRecyclerView.setAdapter(playlistAdapter);
+        playlistRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         super.onResume();
     }
 

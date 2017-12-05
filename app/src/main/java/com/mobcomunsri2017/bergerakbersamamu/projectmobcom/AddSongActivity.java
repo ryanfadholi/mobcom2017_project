@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -82,6 +83,7 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         addSongAdapter = new AddSongAdapter(this, songs, this, Glide.with(this));
 
         addSongRecyclerView.setAdapter(addSongAdapter);
+        addSongRecyclerView.setItemAnimator(new SlideInUpAnimator());
         addSongRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         //Set bottom sheet things
@@ -174,10 +176,15 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
                     return;
                 }
 
-                songs.clear();
-                songs.addAll(response.body().getMusics());
+                ArrayList<Song> tracklist = response.body().getMusics();
+
+                //for searchdata
                 songList = new ArrayList<>();
-                songList.addAll(songs);
+                songList.addAll(tracklist);
+
+                songs.clear();
+                songs.addAll(tracklist);
+
                 addSongAdapter.sortDataset();
                 addSongAdapter.notifyDataSetChanged();
             }
