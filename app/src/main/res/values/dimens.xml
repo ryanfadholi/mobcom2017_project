@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="vote_btn">32dp</dimen>
+    <dimen name="vote_btn">28dp</dimen>
     <dimen name="addsong_bottomsheet">48dp</dimen>
+    <dimen name="collapsed_toolbar_size">180dp</dimen>
 </resources>

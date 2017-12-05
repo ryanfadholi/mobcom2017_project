@@ -1,16 +1,21 @@
 package com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures;
 
+import android.util.Log;
+
 /**
  * Created by rynfd on 10/30/2017.
  */
 
 public class Song {
-    private String musicID;
-    private String album;
-    private String artist;
-    private String title;
-    private String genre;
-    private String base64Img;
+
+    public static String LOG_TAG = "TG.Song";
+
+    protected String musicID;
+    protected String album;
+    protected String artist;
+    protected String title;
+    protected String genre;
+    protected String base64Img;
 
     public Song(String musicID, String title,  String artist, String album) {
         this.musicID = musicID;
@@ -64,26 +69,35 @@ public class Song {
         return base64Img;
     }
 
-    private void fixEmptyFields(){
+    protected void fixEmptyFields(){
 
-        if(this.title == "" || this.title == null){
+        boolean adjusted = false;
+
+        if(this.title.equals("") || this.title.toLowerCase().equals("unknown") || this.title == null){
+            adjusted = true;
             this.title = "Unknown";
         }
 
-        if(this.artist == "" || this.artist == null){
+        if(this.artist.equals("") || this.artist.toLowerCase().equals("unknown") || this.artist == null){
+            adjusted = true;
             this.artist = "Unknown Artist";
         }
 
-        if(this.album == "" || this.album == null){
+        if(this.album.equals("") || this.album.toLowerCase().equals("unknown") || this.album == null){
+            adjusted = true;
             this.album = "Unknown Album";
         }
 
-        if(this.genre == "" || this.genre == null){
+        if(this.genre.equals("") || this.genre.toLowerCase().equals("unknown") || this.genre == null){
+            adjusted = true;
             this.genre = "Unknown";
         }
 
-        if (this.base64Img == "") {
+        if (this.base64Img != null && (this.base64Img == "" || this.base64Img.toLowerCase().equals("null"))) {
+            adjusted = true;
             this.base64Img = null;
         }
+
+        Log.e(LOG_TAG, "(" + musicID + "|" + title + ") fixEmptyFields() is called.");
     }
 }

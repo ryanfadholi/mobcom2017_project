@@ -1,4 +1,4 @@
-package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
+package com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses;
 
 import android.util.Log;
 
@@ -15,34 +15,22 @@ import java.util.ArrayList;
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GetPlaylistResponse {
+public class GetPlaylistResponse extends GetResponseTemplate {
 
-    private String LOG_TAG = "TG.GetPlaylistResponse";
-    private boolean error;
-    private String errorMessage;
-    private JsonNode data;
+    private static final String LOG_TAG = "TG.GetPlaylistResponse";
 
     @JsonCreator
     public GetPlaylistResponse(@JsonProperty("error") boolean error,
-                                     @JsonProperty("error_message") String error_message,
-                                     @JsonProperty("data") JsonNode data) {
+                               @JsonProperty("error_message") String error_message,
+                               @JsonProperty("data") JsonNode data) {
         this.error = error;
         this.errorMessage = error_message;
         this.data = data;
     }
 
-
-    public boolean isError() {
-        return error;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
     public ArrayList<Request> getRequests() {
         ArrayList<Request> result = new ArrayList<>();
-        for (JsonNode request : data) {
+        for (JsonNode request : this.data) {
             String requestID    = request.get("request_id").asText();
             String musicID      = request.get("musics_id").asText();
             String played       = request.get("played").asText();

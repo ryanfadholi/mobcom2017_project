@@ -1,4 +1,4 @@
-package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
+package com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses;
 
 import android.util.Log;
 
@@ -15,12 +15,9 @@ import java.util.ArrayList;
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GetMusicsRequestResponse {
+public class GetMusicsRequestResponse extends GetResponseTemplate {
 
-    private String LOG_TAG = "TG.GetMusicsRequestResponse";
-    private boolean error;
-    private String errorMessage;
-    private JsonNode data;
+    private static final String LOG_TAG = "TG.GetMusicsReqResp";
 
     @JsonCreator
     public GetMusicsRequestResponse (@JsonProperty("error") boolean error,
@@ -29,15 +26,6 @@ public class GetMusicsRequestResponse {
         this.error = error;
         this.errorMessage = error_message;
         this.data = data;
-    }
-
-
-    public boolean isError() {
-        return error;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
     }
 
     public ArrayList<Song> getMusics(){

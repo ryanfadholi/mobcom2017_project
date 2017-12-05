@@ -3,8 +3,6 @@ package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.BottomSheetBehavior;
@@ -23,9 +21,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetCountAllVotesResponse;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetMusicsRequestResponse;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetUserAllVotesResponse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -46,7 +49,13 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
 
     private RecyclerView addSongRecyclerView;
     private AddSongAdapter addSongAdapter;
+
     private ArrayList<Song> songs = new ArrayList<>();
+
+    private HashMap<String, Integer> downvotes = new HashMap<>();
+    private HashMap<String, Integer> upvotes = new HashMap<>();
+    private HashMap<String, Integer> userVotes = new HashMap<>();
+
     private List<Song> songList;
     private SearchView searchView;
 
@@ -70,10 +79,7 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
 
         addSongRecyclerView = findViewById(R.id.add_song);
         addSongRecyclerView.setHasFixedSize(true);
-        addSongAdapter = new AddSongAdapter(this, songs, this);
-
-        // white background notification bar
-        whiteNotificationBar(addSongRecyclerView);
+        addSongAdapter = new AddSongAdapter(this, songs, this, Glide.with(this));
 
         addSongRecyclerView.setAdapter(addSongAdapter);
         addSongRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -96,26 +102,26 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-        fetchSongs();
+        fetchData();
+    }
 
-
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fetchData();
     }
 
     private void showBottomSheet(Song chosenSong){
-        Log.e(LOG_TAG, "Show Step 1");
 
         if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED){
             mBottomSheetText.setText(chosenSong.getTitle() + " - " + chosenSong.getArtist());
             return;
         }
 
-        Log.e(LOG_TAG, "Show Step 2");
         //Show the bottom sheet
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         mBottomSheetBehavior.setHideable(false);
 
-        Log.e(LOG_TAG, "Show Step 3");
         //Handle floating action button animations
         CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) mAddSongFab.getLayoutParams();
         p.gravity = Gravity.NO_GRAVITY;
@@ -124,35 +130,32 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         mAddSongFab.setLayoutParams(p);
         mAddSongFab.show();
 
-        Log.e(LOG_TAG, "Show Step 4");
-
         mBottomSheetText.setText(chosenSong.getTitle() + " - " + chosenSong.getArtist());
     }
 
     private void hideBottomSheet(){
 
-        Log.e(LOG_TAG, "Hide Step 1");
-
-        Log.e(LOG_TAG, "Hide Step 2");
         //Hide the bottom sheet
         mBottomSheetBehavior.setHideable(true);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-
-        Log.e(LOG_TAG, "Hide Step 3");
         //Handle floating action button animations
         CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) mAddSongFab.getLayoutParams();
         p.gravity = Gravity.BOTTOM | Gravity.END;
         p.setAnchorId(View.NO_ID);
         mAddSongFab.setLayoutParams(p);
         mAddSongFab.hide();
+    }
 
-
+    private void fetchData(){
+        this.fetchVotes();
+        this.fetchUserVotes();
+        this.fetchSongs();
     }
 
     private void fetchSongs() {
 
-        PlaylistActivity.checkService();
+        PlaylistActivity.checkService(this);
         Call<GetMusicsRequestResponse> call = service.getMusics();
 
         call.enqueue(new Callback<GetMusicsRequestResponse>() {
@@ -175,12 +178,67 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
                 songs.addAll(response.body().getMusics());
                 songList = new ArrayList<>();
                 songList.addAll(songs);
+                addSongAdapter.sortDataset();
                 addSongAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onFailure(Call<GetMusicsRequestResponse> call, Throwable t) {
                 Log.e(LOG_TAG,"Error! " + t.toString());
+            }
+        });
+    }
+
+    private void fetchUserVotes(){
+        String device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        PlaylistActivity.checkService(this);
+        Call<GetUserAllVotesResponse> call = service.chcekAllUserVotes(device_id);
+
+        call.enqueue(new Callback<GetUserAllVotesResponse>() {
+            @Override
+            public void onResponse(Call<GetUserAllVotesResponse> call, Response<GetUserAllVotesResponse> response) {
+                Log.e(LOG_TAG,"Get User Votes JSON error? " + String.valueOf(response.body().isError()));
+
+                if(response.body().isError()) {
+                    Log.e(LOG_TAG, "Get User Votes JSON Error, " + response.body().getErrorMessage());
+                }
+
+                userVotes.clear();
+                userVotes.putAll(response.body().checkUserVotes());
+
+                Log.e(LOG_TAG,"refreshed user votes: " + userVotes.toString());
+            }
+
+            @Override
+            public void onFailure(Call<GetUserAllVotesResponse> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void fetchVotes(){
+        PlaylistActivity.checkService(this);
+        Call<GetCountAllVotesResponse> call = service.getAllVotes();
+
+        call.enqueue(new Callback<GetCountAllVotesResponse>() {
+            @Override
+            public void onResponse(Call<GetCountAllVotesResponse> call, Response<GetCountAllVotesResponse> response) {
+                Log.e(LOG_TAG,"Get All Votes JSON error? " + String.valueOf(response.body().isError()));
+
+                upvotes.clear();
+                upvotes.putAll(response.body().getUpvotes());
+
+                downvotes.clear();
+                downvotes.putAll(response.body().getDownvotes());
+
+                Log.e(LOG_TAG,"refreshed upvotes: " + upvotes.toString());
+                Log.e(LOG_TAG,"refreshed downvotes: " + downvotes.toString());
+            }
+
+            @Override
+            public void onFailure(Call<GetCountAllVotesResponse> call, Throwable t) {
+
             }
         });
     }
@@ -230,7 +288,7 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
                         }
                     }
                 }
-
+                addSongAdapter.sortDataset();
                 addSongAdapter.notifyDataSetChanged();
                 return false;
             }
@@ -263,14 +321,6 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         super.onBackPressed();
     }
 
-    private void whiteNotificationBar(View view) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int flags = view.getSystemUiVisibility();
-            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-            view.setSystemUiVisibility(flags);
-            getWindow().setStatusBarColor(Color.WHITE);
-        }
-    }
 
     //----------------------------------------------------------------
     //START ADDSONGADAPTER LISTENER IMPLEMENTATION
@@ -292,6 +342,42 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
     @Override
     public String getSelectedSongID() {
         return this.selectedSongID;
+    }
+
+    @Override
+    public Integer getDownvoteCounter(String musicID) {
+        Integer result = this.downvotes.get(musicID);
+
+        return (result != null) ? result : 0;
+    }
+
+    @Override
+    public Integer getUpvoteCounter(String musicID) {
+        Integer result = this.upvotes.get(musicID);
+
+        return (result != null) ? result : 0;
+    }
+
+    @Override
+    public Integer getUserVoteStatus(String musicID) {
+        Integer userVote = userVotes.get(musicID);
+
+        return userVote != null ? userVote : -1;
+    }
+
+    @Override
+    public void setUserVoteStatus(String musicID, int newStatus){
+        userVotes.put(musicID, newStatus);
+    }
+
+    @Override
+    public void updateDownvoteCounter(String musicID, int value) {
+        downvotes.put(musicID, downvotes.get(musicID) + value);
+    }
+
+    @Override
+    public void updateUpvoteCounter(String musicID, int value) {
+        upvotes.put(musicID, upvotes.get(musicID) + value);
     }
 
     //END ADDSONGADAPTER LISTENER IMPLEMENTATION

@@ -3,8 +3,6 @@ package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.provider.Settings;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
@@ -12,15 +10,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Request;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.InsertVoteResponse;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -40,36 +40,45 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
     private Context context;
     private AddSongAdapterListener listener;
 
+    //Untuk efek seleksi
+    private int prevSelectedItemPos;
+
+    //Untuk Glide
+    private RequestManager glideInstance;
+
     public class SongViewHolder extends RecyclerView.ViewHolder {
 
         String musicId;
+
         CardView parent;
+
         ImageView cover;
         TextView title;
         TextView artist;
-        TextView counter;
+
+        TextView upCounter;
+        TextView downCounter;
         ImageView upvote;
         ImageView downvote;
 
         boolean upvoted;
         boolean downvoted;
-        int voteCounter = 0;
 
         int defaultColorCode;
-        int upColorCode;
-        int downColorCode;
+        int selectedCode;
 
         SongViewHolder instance;
-        int itemSelectedColorCode;
-        int itemUnselectedColorCode;
 
         public SongViewHolder(final View itemView) {
             super(itemView);
             parent = itemView.findViewById(R.id.add_song_item);
+
             cover = itemView.findViewById(R.id.song_cover);
             title = itemView.findViewById(R.id.song_title);
             artist = itemView.findViewById(R.id.song_artist);
-            counter = itemView.findViewById(R.id.song_vote_count);
+
+            upCounter = itemView.findViewById(R.id.up_counter);
+            downCounter = itemView.findViewById(R.id.down_counter);
             upvote = itemView.findViewById(R.id.song_upvote);
             downvote = itemView.findViewById(R.id.song_downvote);
 
@@ -82,36 +91,33 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
             downvoted = false;
 
             defaultColorCode = itemView.getResources().getColor(R.color.default_gray);
-            upColorCode = itemView.getResources().getColor(R.color.upvote_green);
-            downColorCode = itemView.getResources().getColor(R.color.downvote_red);
-
-            itemSelectedColorCode = itemView.getResources().getColor(R.color.colorAccent);
-            itemUnselectedColorCode = itemView.getResources().getColor(android.R.color.white);
+            selectedCode = itemView.getResources().getColor(R.color.style_default_color);
 
             upvote.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     upvoted = !upvoted;
 
-                    String snackbarText;
+                    int downCounterChange = 0;
+                    int upCounterChange = 0;
+                    int newVoteStatus = -1;
 
                     if(upvoted){
+                        downCounterChange = downvoted ? -1 : 0;
+                        upCounterChange = 1;
+
                         downvoted = false;
-                        downvote.setColorFilter(defaultColorCode);
-
-                        snackbarText = "Upvoted " + title.getText();
-                        ((ImageView) v).setColorFilter(upColorCode);
-                        voteCounter = 1;
-
+                        setVoteViewState(true, false);
+                        newVoteStatus = 1;
                     } else {
-                        snackbarText = title.getText() + " vote cancelled";
-                        ((ImageView) v).setColorFilter(defaultColorCode);
-                        voteCounter = 0;
+                        setUpvoteViewState(false);
+                        upCounterChange = -1;
                     }
 
                     attemptVote(instance, musicId, "1");
-//                    updateCounter(musicId);
-                    Snackbar.make(v, snackbarText, Snackbar.LENGTH_SHORT).show();
+
+                    listener.setUserVoteStatus(musicId, newVoteStatus);
+                    updateVoteCounter(upCounterChange, downCounterChange);
                 }
             });
 
@@ -120,104 +126,135 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
                 public void onClick(View v) {
                     downvoted = !downvoted;
 
-                    String snackbarText;
+                    int downCounterChange = 0;
+                    int upCounterChange = 0;
+                    int newVoteStatus = -1;
 
                     if(downvoted){
-                        upvoted = false;
-                        upvote.setColorFilter(defaultColorCode);
+                        downCounterChange = 1;
+                        upCounterChange = upvoted ? -1 : 0;
 
-                        snackbarText = "Downvoted " + title.getText();
-                        ((ImageView) v).setColorFilter(downColorCode);
-                        voteCounter = -1;
+                        upvoted = false;
+                        setVoteViewState(false, true);
+
+                        newVoteStatus = 0;
                     } else {
-                        snackbarText = title.getText() + " vote cancelled";
-                        ((ImageView) v).setColorFilter(defaultColorCode);
-                        voteCounter = 0;
+                        setDownvoteViewState(false);
+                        downCounterChange = -1;
                     }
 
                     attemptVote(instance, musicId, "0");
-//                    updateCounter(musicId);
-                    Snackbar.make(v, snackbarText, Snackbar.LENGTH_SHORT).show();
+
+                    listener.setUserVoteStatus(musicId, newVoteStatus);
+                    updateVoteCounter(upCounterChange, downCounterChange);
                 }
             });
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
                     // send selected song in callback
                     Log.e(LOG_TAG, "itemOnClick Called");
                     listener.onSongSelected(songs.get(getAdapterPosition()));
-                    notifyDataSetChanged();
+                    notifyItemChanged(getAdapterPosition());
+
+                    if (prevSelectedItemPos != -1) {
+                        Log.e(LOG_TAG, getAdapterPosition() + ", Prev Pos: " + prevSelectedItemPos);
+                        notifyItemChanged(prevSelectedItemPos);
+                    }
+
+                    prevSelectedItemPos = getAdapterPosition();
                 }
             });
 
         }
 
-        public void checkVotes(String musics_id) {
-            String device_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-            PlaylistActivity.checkService();
-            Call<GetVoteResponse> call = service.checkVotes(musics_id, device_id);
-            call.enqueue(new Callback<GetVoteResponse>() {
-                @Override
-                public void onResponse(Call<GetVoteResponse> call, Response<GetVoteResponse> response) {
-                    Log.e(LOG_TAG,"Check Votes JSON error? " + String.valueOf(response.body().getError()));
-                    int type = response.body().checkVotes();
-                    if (type == 1) {
-                        upvoted = true;
-                        downvoted = false;
-                        upvote.setColorFilter(upColorCode);
-                        downvote.setColorFilter(defaultColorCode);
-                    } else if (type == 0) {
-                        upvoted = false;
-                        downvoted = true;
-                        upvote.setColorFilter(defaultColorCode);
-                        downvote.setColorFilter(downColorCode);
-                    }
-                }
+        public void checkUserVote(String musicId){
+            int voteType = listener.getUserVoteStatus(musicId);
 
-                @Override
-                public void onFailure(Call<GetVoteResponse> call, Throwable t) {
-                    Log.e(LOG_TAG,"Error! " + t.toString());
-                }
-            });
+            if (voteType == 1) {
+                upvoted = true;
+                downvoted = false;
+                setVoteViewState(true, false);
+            } else if (voteType == 0) {
+                upvoted = false;
+                downvoted = true;
+                setVoteViewState(false, true);
+            } else {
+                upvoted = false;
+                downvoted = false;
+                setVoteViewState(false, false);
+            }
         }
 
-        public void updateCounter(String musics_id){
-            PlaylistActivity.checkService();
-            Call<GetCountVoteResponse> call = service.getVotes(musics_id);
-            call.enqueue(new Callback<GetCountVoteResponse>() {
 
-                @Override
-                public void onResponse(Call<GetCountVoteResponse> call, Response<GetCountVoteResponse> response) {
-                    Log.e(LOG_TAG,"Update Counter JSON error? " + String.valueOf(response.body().getError()));
-                    voteCounter = response.body().getVotes();
-                    String counterText = String.valueOf(voteCounter);
+        public void setVoteViewState(boolean isUpvoted, boolean isDownvoted){
+            this.setUpvoteViewState(isUpvoted);
+            this.setDownvoteViewState(isDownvoted);
+        }
 
-                    if(voteCounter > 0){
-                        counterText = "+" + counterText;
-                        counter.setTextColor(upColorCode);
-                    } else if(voteCounter < 0){
-                        counter.setTextColor(downColorCode);
-                    } else {
-                        counter.setTextColor(defaultColorCode);
-                    }
+        public void setUpvoteViewState(boolean isUpvoted){
+            int newColor = isUpvoted ? selectedCode : defaultColorCode;
 
-                    counter.setText(counterText);
-                    Log.e(LOG_TAG, "SET TEXT: " + counterText);
-                }
+            upvote.setColorFilter(newColor);
+            upCounter.setTextColor(newColor);
+        }
 
-                @Override
-                public void onFailure(Call<GetCountVoteResponse> call, Throwable t) {
-                    Log.e(LOG_TAG,"Error! " + t.toString());
-                }
-            });
+        public void setDownvoteViewState(boolean isDownvoted){
+            int newColor = isDownvoted ? selectedCode : defaultColorCode;
+
+            downvote.setColorFilter(newColor);
+            downCounter.setTextColor(newColor);
+        }
+
+        public void updateVoteCounter(int upvoteChange, int downvoteChange){
+            this.updateUpCounter(upvoteChange);
+            this.updateDownCounter(downvoteChange);
+        }
+
+        public void updateDownCounter(int change){
+            if (change == 0) return;
+
+            this.downCounter.setText(
+                    String.valueOf(
+                            Integer.parseInt(
+                                    String.valueOf(
+                                            downCounter.getText())) + change));
+
+            listener.updateDownvoteCounter(this.musicId, change);
+        }
+
+        public void updateUpCounter(int change){
+            if(change == 0) return;
+
+            this.upCounter.setText(
+                    String.valueOf(
+                            Integer.parseInt(
+                                    String.valueOf(
+                                            upCounter.getText())) + change));
+
+            listener.updateUpvoteCounter(this.musicId, change);
         }
     }
 
-    public AddSongAdapter(Context context, List<Song> songs, AddSongAdapterListener listener) {
+    public AddSongAdapter(Context context, List<Song> songs, AddSongAdapterListener listener, RequestManager glideInstance) {
         this.context = context;
         this.listener = listener;
         this.songs = songs;
+
+        this.glideInstance = glideInstance;
+
+        this.prevSelectedItemPos = -1;
+    }
+
+    public void sortDataset(){
+        Collections.sort(songs, new Comparator<Song>() {
+            @Override
+            public int compare(Song o1, Song o2) {
+                return o1.getTitle().toLowerCase().compareTo(o2.getTitle().toLowerCase());
+            }
+        });
     }
 
     @Override
@@ -234,36 +271,37 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
         Typeface boldTypeface = Typeface.defaultFromStyle(Typeface.BOLD);
         Typeface normalTypeface = Typeface.defaultFromStyle(Typeface.NORMAL);
 
+        String currentMusicId = songs.get(position).getMusicID();
+
         holder.title.setText(songs.get(position).getTitle());
         holder.artist.setText(songs.get(position).getArtist());
-        holder.musicId = songs.get(position).getMusicID();
+        holder.musicId = currentMusicId;
 
-        holder.updateCounter(holder.musicId);
-        holder.checkVotes(holder.musicId);
+        holder.upCounter.setText(String.valueOf(listener.getUpvoteCounter(currentMusicId)));
+        holder.downCounter.setText(String.valueOf(listener.getDownvoteCounter(currentMusicId)));
+        holder.checkUserVote(currentMusicId);
 
         Log.e(LOG_TAG, songs.get(position).getTitle() + ", " + songs.get(position).getBase64Img());
-        Glide.with(holder.itemView.getContext())
-                .load(R.drawable.p200x200)
-                .into(holder.cover);
 
         String imageBytes = songs.get(position).getBase64Img();
-        if (imageBytes.contains("null")) imageBytes = null;
 
-        if (imageBytes != null) {
-            byte[] imageByteArray = Base64.decode(imageBytes, Base64.DEFAULT);
+        byte[] imageByteArray = null;
+        if (imageBytes != null) imageByteArray = Base64.decode(imageBytes, Base64.DEFAULT);
 
-            Glide.with(holder.itemView.getContext())
-                    .load(imageByteArray)
-                    .asBitmap()
-                    .into(holder.cover);
-        }
+        glideInstance
+                .load(imageByteArray)
+                .asBitmap()
+                .placeholder(R.drawable.p200x200)
+                .fallback(R.drawable.p200x200)
+                .error(R.drawable.p200x200)
+                .into(holder.cover);
 
         if(songs.get(position).getMusicID().equals(listener.getSelectedSongID())){
-//            holder.parent.setCardBackgroundColor(holder.itemSelectedColorCode);
             holder.title.setTypeface(boldTypeface);
             holder.artist.setTypeface(boldTypeface);
+
+            prevSelectedItemPos = position;
         } else {
-//            holder.parent.setCardBackgroundColor(holder.itemUnselectedColorCode);
             holder.title.setTypeface(normalTypeface);
             holder.artist.setTypeface(normalTypeface);
         }
@@ -281,13 +319,26 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
 
     public void updateList(List<Song> list) {
         songs = list;
+        sortDataset();
         notifyDataSetChanged();
     }
 
     public interface AddSongAdapterListener {
         void onSongSelected(Song song);
+
         String getSelectedSongID();
+
+        Integer getDownvoteCounter(String musicID);
+        void updateDownvoteCounter(String musicID, int value);
+
+        Integer getUpvoteCounter(String musicID);
+        void updateUpvoteCounter(String musicID, int value);
+
+        Integer getUserVoteStatus(String musicID);
+        void setUserVoteStatus(String musicID, int newStatus);
+
     }
+
 
     private void attemptVote(final SongViewHolder svh, final String musics_id, String type) {
         String device_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -297,17 +348,8 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
             @Override
             public void onResponse(Call<InsertVoteResponse> call, Response<InsertVoteResponse> response) {
                 Log.e(LOG_TAG,"Insert Request JSON error? " + String.valueOf(response.body().getError()));
-                svh.updateCounter(musics_id);
-//                String snackbarContent;
-//                if(!response.body().getError()){
-//                    snackbarContent = "Song requested successfully";
-//                } else {
-//                    snackbarContent = "Failed to request song";
-//                    Log.e(LOG_TAG,response.body().getError_message());
-//                }
-//
-//                Snackbar.make(view, snackbarContent, Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
+                //svh.updateCounter(musics_id);
+
 
             }
 

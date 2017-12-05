@@ -3,6 +3,7 @@
     android:layout_height="wrap_content"
     android:id="@+id/add_song_item"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:clickable="true"
     android:layout_marginTop="8dp"
     android:layout_marginLeft="8dp"
     android:layout_marginRight="8dp">
@@ -15,8 +16,8 @@
 
         <ImageView
             android:id="@+id/song_cover"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_marginRight="16dp"
@@ -53,37 +54,65 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/upvote_group"
+            android:layout_height="match_parent"
             android:layout_width="wrap_content"
-            android:layout_height= "wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_toLeftOf="@id/downvote_group"
             android:layout_centerVertical="true"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <ImageView
                 android:layout_width="@dimen/vote_btn"
                 android:layout_height="@dimen/vote_btn"
                 android:id="@+id/song_upvote"
+                android:gravity="center_horizontal"
                 android:tint="@color/default_gray"
                 android:layout_marginBottom="4dp"
-                android:layout_marginRight="4dp"
-                android:src="@drawable/ic_arrow_up_bold"/>
+                android:src="@drawable/ic_thumb_up_black_48dp"/>
 
             <TextView
-                android:id="@+id/song_vote_count"
+                android:id="@+id/up_counter"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="0"
-                android:textSize="20dp" />
+                android:layout_height="match_parent"
+                android:text="@string/vote_counter_placeholder"
+                android:textSize="12sp"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/default_gray"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/downvote_group"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:orientation="vertical">
 
             <ImageView
                 android:layout_width="@dimen/vote_btn"
                 android:layout_height="@dimen/vote_btn"
+                android:background="?selectableItemBackgroundBorderless"
                 android:id="@+id/song_downvote"
+                android:gravity="center_horizontal"
                 android:tint="@color/default_gray"
-                android:layout_marginTop="4dp"
-                android:layout_marginLeft="4dp"
-                android:src="@drawable/ic_arrow_down_bold"/>
+                android:layout_marginBottom="4dp"
+                android:src="@drawable/ic_thumb_down_black_48dp"/>
+
+            <TextView
+                android:id="@+id/down_counter"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="-"
+                android:textSize="12sp"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/default_gray"/>
 
         </LinearLayout>
 
