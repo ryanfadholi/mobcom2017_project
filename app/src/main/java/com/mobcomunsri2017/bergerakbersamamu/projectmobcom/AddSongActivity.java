@@ -3,6 +3,7 @@ package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.BottomSheetBehavior;
@@ -19,6 +20,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -48,6 +50,7 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
 
     public static String EXTRA_MUSIC_ID = "AddSong.MusicID";
 
+    private ProgressBar addSongProgressBar;
     private RecyclerView addSongRecyclerView;
     private AddSongAdapter addSongAdapter;
 
@@ -78,12 +81,17 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
 
         setTitle("Tracklist");
 
+        addSongProgressBar = findViewById(R.id.addsong_progress);
+        addSongProgressBar.getIndeterminateDrawable().setColorFilter(
+                getResources().getColor(R.color.style_default_color),
+                PorterDuff.Mode.MULTIPLY
+        );
+
         addSongRecyclerView = findViewById(R.id.add_song);
         addSongRecyclerView.setHasFixedSize(true);
         addSongAdapter = new AddSongAdapter(this, songs, this, Glide.with(this));
 
         addSongRecyclerView.setAdapter(addSongAdapter);
-        addSongRecyclerView.setItemAnimator(new SlideInUpAnimator());
         addSongRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         //Set bottom sheet things
@@ -110,6 +118,10 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
     @Override
     protected void onResume() {
         super.onResume();
+        selectedSongID = "-1";
+        if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED){
+            hideBottomSheet();
+        }
         fetchData();
     }
 
@@ -150,6 +162,8 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
     }
 
     private void fetchData(){
+        addSongRecyclerView.setVisibility(View.GONE);
+        addSongProgressBar.setVisibility(View.VISIBLE);
         this.fetchVotes();
         this.fetchUserVotes();
         this.fetchSongs();
@@ -187,6 +201,10 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
 
                 addSongAdapter.sortDataset();
                 addSongAdapter.notifyDataSetChanged();
+
+                Log.e(LOG_TAG, "Should be here anytime soon....");
+                addSongProgressBar.setVisibility(View.GONE);
+                addSongRecyclerView.setVisibility(View.VISIBLE);
             }
 
             @Override

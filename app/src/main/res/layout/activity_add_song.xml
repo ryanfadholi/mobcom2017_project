@@ -11,7 +11,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/addsong_appbar"
         android:layout_width="match_parent"
-        android:layout_height="192dp"
+        android:layout_height="@dimen/addsong_appbar"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
 
 
@@ -41,7 +41,7 @@
         app:layout_anchorGravity="top|end"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_check_black_24dp"
-        android:tint="@android:color/white"
+        android:backgroundTint="@color/colorAccentDark"
         android:visibility="invisible"/>
 
     <LinearLayout
@@ -51,17 +51,30 @@
         android:background="@color/colorPrimaryLight"
         app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
         app:behavior_hideable="true"
-        android:orientation="horizontal"
+        android:orientation="vertical"
+
         >
 
+        <TextView
+            android:id="@+id/addsong_bottom_sheet_title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/addsong_bottomsheet_title"
+            android:textSize="@dimen/bottom_sheet_title_textsize"
+            android:ellipsize="marquee"
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/default_margin"
+            android:layout_marginLeft="@dimen/default_margin"
+            android:textColor="@color/style_default_color"/>
 
         <TextView
             android:id="@+id/addsong_bottom_sheet_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="Placeholder"
-            android:padding="16dp"
-            android:textSize="16sp"
+            android:layout_marginLeft="@dimen/default_margin"
+            android:paddingBottom="@dimen/default_margin"
+            android:textSize="@dimen/addsong_bottomsheet_selected_textsize"
             android:ellipsize="marquee"
             android:textColor="@color/style_default_color"/>
 

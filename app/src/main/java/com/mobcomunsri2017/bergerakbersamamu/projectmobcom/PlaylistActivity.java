@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -27,6 +29,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -69,7 +72,10 @@ public class PlaylistActivity extends AppCompatActivity {
     private ArrayList<Song> songs = new ArrayList<>();
     private ArrayList<Request> requests = new ArrayList<>();
 
+    private ProgressBar playlistProgressBar;
+    private CollapsingToolbarLayout collapsingToolbar;
     private Toolbar nowPlayingToolbar;
+    private CardView playlistQueue;
     private TextView nowPlayingTitle;
     private TextView nowPlayingSongTitle;
     private TextView nowPlayingSongArtist;
@@ -91,9 +97,10 @@ public class PlaylistActivity extends AppCompatActivity {
         nowPlayingToolbar = findViewById(R.id.playlist_toolbar);
         setSupportActionBar(nowPlayingToolbar);
 
-        final CollapsingToolbarLayout collapsingToolbar =
-                 findViewById(R.id.playlist_collapsing_toolbar);
+        collapsingToolbar = findViewById(R.id.playlist_collapsing_toolbar);
+        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.style_default_color));
         collapsingToolbar.setTitle(" ");
+
         AppBarLayout appBarLayout = findViewById(R.id.playlist_appbar);
         appBarLayout.setExpanded(true);
         // hiding & showing the title when toolbar expanded & collapsed
@@ -125,6 +132,12 @@ public class PlaylistActivity extends AppCompatActivity {
             }
         });
 
+        playlistProgressBar = findViewById(R.id.playlist_progress);
+        playlistProgressBar.getIndeterminateDrawable().setColorFilter(
+                getResources().getColor(R.color.style_default_color),
+                PorterDuff.Mode.MULTIPLY
+        );
+
         //Initialize views
         nowPlayingTitle = findViewById(R.id.nowplaying_title);
         nowPlayingSongTitle = findViewById(R.id.nowplaying_song_title);
@@ -132,6 +145,7 @@ public class PlaylistActivity extends AppCompatActivity {
         nowPlayingCover = findViewById(R.id.nowplaying_cover);
         nowPlayingCoverGradient = findViewById(R.id.nowplaying_gradient);
         nowPlayingToolbarLayout = findViewById(R.id.playlist_toolbar_layout);
+        playlistQueue = findViewById(R.id.playlist_queue);
 
         currentToolbarColor = getResources().getColor(R.color.colorPrimary);
 
@@ -143,13 +157,13 @@ public class PlaylistActivity extends AppCompatActivity {
 
         //Retrieve Data
         this.initPlaylist(this);
-        this.fetchCurrentlyPlaying();
+        this.fetchCurrentlyPlaying(false);
+        this.fetchRequests();
 
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                fetchCurrentlyPlaying();
-                fetchRequests();
+                fetchCurrentlyPlaying(true);
             }
         }, 1000, 5000);
     }
@@ -225,6 +239,8 @@ public class PlaylistActivity extends AppCompatActivity {
                     animateToolbarChange(currentToolbarColor, bgColor, true);
                     currentToolbarColor = bgColor;
 
+
+                    collapsingToolbar.setCollapsedTitleTextColor(dominantSwatch.getTitleTextColor());
                     nowPlayingTitle.setTextColor(dominantSwatch.getTitleTextColor());
                     nowPlayingSongTitle.setTextColor(dominantSwatch.getBodyTextColor());
                     nowPlayingSongArtist.setTextColor(dominantSwatch.getBodyTextColor());
@@ -238,6 +254,7 @@ public class PlaylistActivity extends AppCompatActivity {
         } else {
 
             animateToolbarChange(currentToolbarColor, defaultToolbarColor, false);
+            collapsingToolbar.setCollapsedTitleTextColor(defaultToolbarTextColor);
             this.nowPlayingTitle.setTextColor(defaultToolbarTextColor);
             this.nowPlayingSongTitle.setTextColor(defaultToolbarTextColor);
             this.nowPlayingSongArtist.setTextColor(defaultToolbarTextColor);
@@ -245,6 +262,10 @@ public class PlaylistActivity extends AppCompatActivity {
     }
 
     public void fetchRequests() {
+
+        playlistQueue.setVisibility(View.GONE);
+        playlistProgressBar.setVisibility(View.VISIBLE);
+
         PlaylistActivity.checkService(this);
         Call<GetPlaylistResponse> call = service.getUnplayedRequest();
 
@@ -267,6 +288,8 @@ public class PlaylistActivity extends AppCompatActivity {
                 playlistAdapter.sortDataset();
                 playlistAdapter.notifyDataSetChanged();
 
+                playlistProgressBar.setVisibility(View.GONE);
+                playlistQueue.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -276,7 +299,7 @@ public class PlaylistActivity extends AppCompatActivity {
         });
     }
 
-    private void fetchCurrentlyPlaying(){
+    private void fetchCurrentlyPlaying(final boolean triggerRequestRefresh){
         PlaylistActivity.checkService(this);
         Call<GetNowPlayingResponse> call = service.getCurrentlyPlaying();
 
@@ -296,6 +319,7 @@ public class PlaylistActivity extends AppCompatActivity {
                     Log.e(LOG_TAG, "Playin' new song!");
                     updateNowPlayingText();
                     adjustToolbarStyle();
+                    if(triggerRequestRefresh) fetchRequests();
                 }
 
             }
@@ -319,6 +343,9 @@ public class PlaylistActivity extends AppCompatActivity {
 
         playlistRecyclerView.setAdapter(playlistAdapter);
         playlistRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+
+        this.fetchCurrentlyPlaying(false);
+        this.fetchRequests();
         super.onResume();
     }
 

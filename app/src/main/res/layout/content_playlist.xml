@@ -25,17 +25,25 @@
             android:gravity="center_horizontal"
             android:layout_margin="16dp"/>
 
+        <ProgressBar android:indeterminate="true"
+            android:layout_marginTop="@dimen/default_margin"
+            android:layout_width="@dimen/progressbar_default" android:layout_height="@dimen/progressbar_default"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/playlist_progress"
+            android:layout_centerInParent="true" />
+
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/playlist_item"
+            android:id="@+id/playlist_queue"
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_marginTop="8dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
             android:paddingBottom="20dp"
             android:fitsSystemWindows= "true"
-            android:clipToPadding="false">
+            android:clipToPadding="false"
+            android:visibility="gone">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/playlist"
