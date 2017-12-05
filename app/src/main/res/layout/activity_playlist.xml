@@ -17,7 +17,7 @@
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/playlist_collapsing_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:layout_height="@dimen/collapsed_toolbar_size"
             android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginEnd="64dp"
@@ -32,17 +32,28 @@
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
             <RelativeLayout
+                android:id="@+id/playlist_toolbar_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <!--<ImageView-->
-                <!--android:id="@+id/backdrop"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:fitsSystemWindows="true"-->
-                <!--android:scaleType="centerCrop"-->
-                <!--app:layout_collapseMode="parallax" />-->
+                <ImageView
+                    android:id="@+id/nowplaying_cover"
+                    android:src="@drawable/p200x200"
+                    android:layout_width="@dimen/collapsed_toolbar_size"
+                    android:layout_height="@dimen/collapsed_toolbar_size"
+                    android:layout_alignParentRight="true"
+                    android:fitsSystemWindows="true"
+                    android:scaleType="centerCrop"
+                    android:visibility="invisible"
+                    app:layout_collapseMode="parallax" />
 
+                <View
+                    android:id="@+id/nowplaying_gradient"
+                    android:background="@drawable/alpha_linear_gradient"
+                    android:layout_width="@dimen/collapsed_toolbar_size"
+                    android:visibility="invisible"
+                    android:layout_height="@dimen/collapsed_toolbar_size"
+                    android:layout_alignParentRight="true" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -56,7 +67,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:text="NOW PLAYING"
-                        android:textColor="@android:color/white"
+                        android:textColor="@color/style_default_color"
                         android:textSize="24dp" />
 
                     <TextView
@@ -65,7 +76,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:text="Now Loading....."
-                        android:textColor="@android:color/white"
+                        android:textColor="@color/style_default_color"
                         android:textSize="20dp" />
                 </LinearLayout>
             </RelativeLayout>

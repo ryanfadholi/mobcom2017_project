@@ -1,20 +1,31 @@
 package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 
+import android.content.ContentQueryMap;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -22,9 +33,14 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import com.bumptech.glide.Glide;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.NowPlayingSong;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Request;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetNowPlayingResponse;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetPlaylistResponse;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.InsertRequestResponse;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -39,6 +55,8 @@ public class PlaylistActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "TG.PlaylistActivity";
     public static final int REQUEST_CODE_ADD_SONG = 1;
+    private static final int CACHE_SIZE = 20 * 1024 * 1024; // 20 MB
+
     public static PlaylistService service;
 
     private RecyclerView playlistRecyclerView;
@@ -46,21 +64,29 @@ public class PlaylistActivity extends AppCompatActivity {
     private ArrayList<Song> songs = new ArrayList<>();
     private ArrayList<Request> requests = new ArrayList<>();
 
+    private Toolbar nowPlayingToolbar;
     private TextView nowPlayingTitle;
     private TextView nowPlayingDetails;
+    private ImageView nowPlayingCover;
+    private View nowPlayingCoverGradient;
+    private RelativeLayout nowPlayingToolbarLayout;
+
     private Context mContext;
+
+    private NowPlayingSong nowPlaying = new NowPlayingSong("", "", "", "", "", "", "");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.playlist_toolbar);
-        setSupportActionBar(toolbar);
+
+        nowPlayingToolbar = findViewById(R.id.playlist_toolbar);
+        setSupportActionBar(nowPlayingToolbar);
 
         final CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) findViewById(R.id.playlist_collapsing_toolbar);
+                 findViewById(R.id.playlist_collapsing_toolbar);
         collapsingToolbar.setTitle(" ");
-        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.playlist_appbar);
+        AppBarLayout appBarLayout = findViewById(R.id.playlist_appbar);
         appBarLayout.setExpanded(true);
         // hiding & showing the title when toolbar expanded & collapsed
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -93,22 +119,79 @@ public class PlaylistActivity extends AppCompatActivity {
 
         //Initialize views
         nowPlayingTitle = findViewById(R.id.nowplaying_title);
-        nowPlayingTitle = findViewById(R.id.nowplaying_detail);
+        nowPlayingDetails = findViewById(R.id.nowplaying_detail);
+        nowPlayingCover = findViewById(R.id.nowplaying_cover);
+        nowPlayingCoverGradient = findViewById(R.id.nowplaying_gradient);
+        nowPlayingToolbarLayout = findViewById(R.id.playlist_toolbar_layout);
 
         //Retrieve Data
-        this.initPlaylist();
+        this.initPlaylist(this);
+        this.fetchCurrentlyPlaying();
 
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                //fetchCurrentlyPlaying();
+                fetchCurrentlyPlaying();
                 fetchRequests();
             }
         }, 1000, 5000);
     }
 
+    private void calculate
+
+    private void adjustToolbarStyle(){
+        int defaultToolbarColor = getResources().getColor(R.color.colorPrimary);
+        int defaultToolbarTextColor = getResources().getColor(R.color.style_default_color);
+
+        boolean isCoverArtSet = false;
+
+        if(nowPlaying.getBase64Img() != null) isCoverArtSet = true;
+
+        if(isCoverArtSet){
+            Palette.PaletteAsyncListener paletteListener = new Palette.PaletteAsyncListener() {
+                public void onGenerated(Palette palette) {
+                    int defaultColor = 0x000000;
+
+                    Palette.Swatch dominantSwatch = palette.getDominantSwatch();
+                    int bgColor = dominantSwatch.getRgb();
+
+                    nowPlayingToolbar.setBackgroundColor(bgColor);
+                    nowPlayingToolbarLayout.setBackgroundColor(bgColor);
+                    nowPlayingTitle.setTextColor(dominantSwatch.getTitleTextColor());
+                    nowPlayingDetails.setTextColor(dominantSwatch.getBodyTextColor());
+
+                    GradientDrawable drawable = new GradientDrawable(
+                            GradientDrawable.Orientation.LEFT_RIGHT,
+                            new int[] { bgColor, ColorUtils.setAlphaComponent(bgColor, 0)}
+                            );
+
+                    nowPlayingCoverGradient.setBackground(drawable);
+
+
+                }
+            };
+
+            byte[] coverArtByte = Base64.decode(nowPlaying.getBase64Img(), Base64.DEFAULT);
+            Bitmap coverArt = BitmapFactory.decodeByteArray(coverArtByte, 0, coverArtByte.length);
+            Palette.from(coverArt).generate(paletteListener);
+
+            Glide.with(this).load(coverArtByte).asBitmap().into(nowPlayingCover);
+            nowPlayingCover.setVisibility(View.VISIBLE);
+            nowPlayingCoverGradient.setVisibility(View.VISIBLE);
+
+        } else {
+            nowPlayingCover.setVisibility(View.INVISIBLE);
+            nowPlayingCoverGradient.setVisibility(View.INVISIBLE);
+
+            this.nowPlayingToolbar.setBackgroundColor(defaultToolbarColor);
+            this.nowPlayingToolbarLayout.setBackgroundColor(defaultToolbarColor);
+            this.nowPlayingTitle.setTextColor(defaultToolbarTextColor);
+            this.nowPlayingDetails.setTextColor(defaultToolbarTextColor);
+        }
+    }
+
     public void fetchRequests() {
-        PlaylistActivity.checkService();
+        PlaylistActivity.checkService(this);
         Call<GetPlaylistResponse> call = service.getUnplayedRequest();
 
         call.enqueue(new Callback<GetPlaylistResponse>() {
@@ -141,42 +224,43 @@ public class PlaylistActivity extends AppCompatActivity {
     }
 
     private void fetchCurrentlyPlaying(){
-        PlaylistActivity.checkService();
-        Call<JsonNode> call = service.getCurrentlyPlaying();
+        PlaylistActivity.checkService(this);
+        Call<GetNowPlayingResponse> call = service.getCurrentlyPlaying();
 
-        call.enqueue(new Callback<JsonNode>() {
+        call.enqueue(new Callback<GetNowPlayingResponse>() {
             @Override
-            public void onResponse(Call<JsonNode> call, Response<JsonNode> response) {
-                Log.e(LOG_TAG, "welp, this is actually called!");
+            public void onResponse(Call<GetNowPlayingResponse> call, Response<GetNowPlayingResponse> response) {
+                Log.e(LOG_TAG,"Get Currently Playing JSON error? "
+                        + String.valueOf(response.body().isError()));
 
-                Log.e(LOG_TAG, "json: " + response.body().toString());
-//                if (response.body().isError()) {
-//                    nowPlayingTitle.setText("Uh-Oh!");
-//                    nowPlayingDetails.setText("We experienced some problems. Please try again.");
-//
-//                    Log.e(LOG_TAG, response.body().getErrorMessage());
-//                    return;
-//                }
-//
-//                Log.e(LOG_TAG, "Wadooooo");
-//
-//                Log.e(LOG_TAG, response.body().toString());
-//
-//                response.body().getCurrentSong();
+                if(nowPlaying.getRequestID().
+                        equals(
+                                response.body().getNowPlaying().getRequestID())){
+                    Log.e(LOG_TAG, "Still playing...");
+                    return;
+                } else {
+                    nowPlaying = new NowPlayingSong(response.body().getNowPlaying());
+                    Log.e(LOG_TAG, "Playin' new song!");
+                    updateNowPlayingText();
+                    adjustToolbarStyle();
+                }
 
-//                nowPlayingDetails.setText(currentSong.getTitle() + " | " + currentSong.getArtist());
             }
 
             @Override
-            public void onFailure(Call<JsonNode> call, Throwable t) {
-                Log.e(LOG_TAG, t.toString());
+            public void onFailure(Call<GetNowPlayingResponse> call, Throwable t) {
+
             }
         });
     }
 
+    private void updateNowPlayingText(){
+        this.nowPlayingDetails.setText(nowPlaying.getTitle() + " - " + nowPlaying.getArtist());
+    }
+
     @Override
     protected void onResume() {
-        checkService();
+        checkService(this);
         super.onResume();
     }
 
@@ -195,19 +279,26 @@ public class PlaylistActivity extends AppCompatActivity {
         }
     }
 
-    public static void checkService(){
+    public static void checkService(Context context){
         if(service == null){
-            initPlaylist();
+            initPlaylist(context);
         }
     }
 
-    public static void initPlaylist(){
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+    public static void initPlaylist(Context cacheContext){
 
-        Retrofit.Builder builder = new Retrofit.Builder().baseUrl(BASE_WEB_SERVICE_URL)
+        Cache mCache = new Cache(cacheContext.getCacheDir(), CACHE_SIZE);
+
+        OkHttpClient httpClient = new OkHttpClient.Builder()
+                .cache(mCache)
+                .build();
+
+        Retrofit.Builder builder = new Retrofit.Builder()
+                .baseUrl(BASE_WEB_SERVICE_URL)
+                .client(httpClient)
                 .addConverterFactory(JacksonConverterFactory.create());
 
-        Retrofit retrofit = builder.client(httpClient.build()).build();
+        Retrofit retrofit = builder.build();
 
         service = retrofit.create(PlaylistService.class);
     }

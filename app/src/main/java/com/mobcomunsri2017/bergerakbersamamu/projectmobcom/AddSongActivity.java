@@ -3,8 +3,6 @@ package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.BottomSheetBehavior;
@@ -23,7 +21,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetCountAllVotesResponse;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetMusicsRequestResponse;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetUserAllVotesResponse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,7 +79,7 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
 
         addSongRecyclerView = findViewById(R.id.add_song);
         addSongRecyclerView.setHasFixedSize(true);
-        addSongAdapter = new AddSongAdapter(this, songs, this);
+        addSongAdapter = new AddSongAdapter(this, songs, this, Glide.with(this));
 
         addSongRecyclerView.setAdapter(addSongAdapter);
         addSongRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -103,20 +105,23 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         fetchData();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fetchData();
+    }
+
     private void showBottomSheet(Song chosenSong){
-        Log.e(LOG_TAG, "Show Step 1");
 
         if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED){
             mBottomSheetText.setText(chosenSong.getTitle() + " - " + chosenSong.getArtist());
             return;
         }
 
-        Log.e(LOG_TAG, "Show Step 2");
         //Show the bottom sheet
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         mBottomSheetBehavior.setHideable(false);
 
-        Log.e(LOG_TAG, "Show Step 3");
         //Handle floating action button animations
         CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) mAddSongFab.getLayoutParams();
         p.gravity = Gravity.NO_GRAVITY;
@@ -125,30 +130,21 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         mAddSongFab.setLayoutParams(p);
         mAddSongFab.show();
 
-        Log.e(LOG_TAG, "Show Step 4");
-
         mBottomSheetText.setText(chosenSong.getTitle() + " - " + chosenSong.getArtist());
     }
 
     private void hideBottomSheet(){
 
-        Log.e(LOG_TAG, "Hide Step 1");
-
-        Log.e(LOG_TAG, "Hide Step 2");
         //Hide the bottom sheet
         mBottomSheetBehavior.setHideable(true);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-
-        Log.e(LOG_TAG, "Hide Step 3");
         //Handle floating action button animations
         CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) mAddSongFab.getLayoutParams();
         p.gravity = Gravity.BOTTOM | Gravity.END;
         p.setAnchorId(View.NO_ID);
         mAddSongFab.setLayoutParams(p);
         mAddSongFab.hide();
-
-
     }
 
     private void fetchData(){
@@ -159,7 +155,7 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
 
     private void fetchSongs() {
 
-        PlaylistActivity.checkService();
+        PlaylistActivity.checkService(this);
         Call<GetMusicsRequestResponse> call = service.getMusics();
 
         call.enqueue(new Callback<GetMusicsRequestResponse>() {
@@ -182,6 +178,7 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
                 songs.addAll(response.body().getMusics());
                 songList = new ArrayList<>();
                 songList.addAll(songs);
+                addSongAdapter.sortDataset();
                 addSongAdapter.notifyDataSetChanged();
             }
 
@@ -195,7 +192,7 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
     private void fetchUserVotes(){
         String device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        PlaylistActivity.checkService();
+        PlaylistActivity.checkService(this);
         Call<GetUserAllVotesResponse> call = service.chcekAllUserVotes(device_id);
 
         call.enqueue(new Callback<GetUserAllVotesResponse>() {
@@ -221,7 +218,7 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
     }
 
     private void fetchVotes(){
-        PlaylistActivity.checkService();
+        PlaylistActivity.checkService(this);
         Call<GetCountAllVotesResponse> call = service.getAllVotes();
 
         call.enqueue(new Callback<GetCountAllVotesResponse>() {
@@ -291,7 +288,7 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
                         }
                     }
                 }
-
+                addSongAdapter.sortDataset();
                 addSongAdapter.notifyDataSetChanged();
                 return false;
             }

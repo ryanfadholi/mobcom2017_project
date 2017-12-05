@@ -1,6 +1,15 @@
 package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetCountAllVotesResponse;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetMusicsRequestResponse;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetNowPlayingResponse;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetPlaylistResponse;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetTotalVoteResponse;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetUserAllVotesResponse;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.GetUserVoteResponse;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.InsertRequestResponse;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.InsertVoteResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -49,5 +58,5 @@ public interface PlaylistService {
     Call<GetPlaylistResponse> getUnplayedRequest();
 
     @GET("player/get_currently_playing")
-    Call<JsonNode> getCurrentlyPlaying();
+    Call<GetNowPlayingResponse> getCurrentlyPlaying();
 }

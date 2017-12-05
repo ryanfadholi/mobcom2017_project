@@ -14,8 +14,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Request;
 import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.datastructures.Song;
+import com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses.InsertVoteResponse;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -37,6 +42,9 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
 
     //Untuk efek seleksi
     private int prevSelectedItemPos;
+
+    //Untuk Glide
+    private RequestManager glideInstance;
 
     public class SongViewHolder extends RecyclerView.ViewHolder {
 
@@ -230,12 +238,23 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
         }
     }
 
-    public AddSongAdapter(Context context, List<Song> songs, AddSongAdapterListener listener) {
+    public AddSongAdapter(Context context, List<Song> songs, AddSongAdapterListener listener, RequestManager glideInstance) {
         this.context = context;
         this.listener = listener;
         this.songs = songs;
 
+        this.glideInstance = glideInstance;
+
         this.prevSelectedItemPos = -1;
+    }
+
+    public void sortDataset(){
+        Collections.sort(songs, new Comparator<Song>() {
+            @Override
+            public int compare(Song o1, Song o2) {
+                return o1.getTitle().toLowerCase().compareTo(o2.getTitle().toLowerCase());
+            }
+        });
     }
 
     @Override
@@ -263,21 +282,19 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
         holder.checkUserVote(currentMusicId);
 
         Log.e(LOG_TAG, songs.get(position).getTitle() + ", " + songs.get(position).getBase64Img());
-        Glide.with(holder.itemView.getContext())
-                .load(R.drawable.p200x200)
-                .into(holder.cover);
 
         String imageBytes = songs.get(position).getBase64Img();
-        if (imageBytes.contains("null")) imageBytes = null;
 
-        if (imageBytes != null) {
-            byte[] imageByteArray = Base64.decode(imageBytes, Base64.DEFAULT);
+        byte[] imageByteArray = null;
+        if (imageBytes != null) imageByteArray = Base64.decode(imageBytes, Base64.DEFAULT);
 
-            Glide.with(holder.itemView.getContext())
-                    .load(imageByteArray)
-                    .asBitmap()
-                    .into(holder.cover);
-        }
+        glideInstance
+                .load(imageByteArray)
+                .asBitmap()
+                .placeholder(R.drawable.p200x200)
+                .fallback(R.drawable.p200x200)
+                .error(R.drawable.p200x200)
+                .into(holder.cover);
 
         if(songs.get(position).getMusicID().equals(listener.getSelectedSongID())){
             holder.title.setTypeface(boldTypeface);
@@ -302,6 +319,7 @@ public class AddSongAdapter extends RecyclerView.Adapter<AddSongAdapter.SongView
 
     public void updateList(List<Song> list) {
         songs = list;
+        sortDataset();
         notifyDataSetChanged();
     }
 

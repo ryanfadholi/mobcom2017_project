@@ -1,4 +1,4 @@
-package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
+package com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses;
 
 import android.util.Log;
 

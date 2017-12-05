@@ -70,8 +70,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
 
         String imageBytes = requests.get(position).getBase64Img();
 
-        if (imageBytes.contains("null")) imageBytes = null;
-
         if (imageBytes != null) {
             byte[] imageByteArray = Base64.decode(imageBytes, Base64.DEFAULT);
 

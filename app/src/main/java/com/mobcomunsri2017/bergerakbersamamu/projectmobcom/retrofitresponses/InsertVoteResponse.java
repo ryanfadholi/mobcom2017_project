@@ -1,4 +1,4 @@
-package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
+package com.mobcomunsri2017.bergerakbersamamu.projectmobcom.retrofitresponses;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class InsertVoteResponse {
+public class InsertVoteResponse extends GetResponseTemplate {
     private boolean error;
     private String error_message;
 
