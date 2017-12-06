@@ -39,10 +39,12 @@
         android:layout_height="wrap_content"
         app:layout_anchor="@id/bottom_sheet"
         app:layout_anchorGravity="top|end"
+        app:backgroundTint="@color/colorAccentDark"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_check_black_24dp"
-        android:backgroundTint="@color/colorAccentDark"
         android:visibility="invisible"/>
+
+    <!--android:backgroundTint="@color/colorAccentDark"-->
 
     <LinearLayout
         android:id="@+id/bottom_sheet"
