@@ -11,21 +11,47 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="20dp"
+        android:fitsSystemWindows= "true"
+        android:clipToPadding="false">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ON DECK"
-            android:textSize="32dp"
+            android:text="Up Next"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal"
             android:layout_margin="16dp"/>
+
+        <ProgressBar android:indeterminate="true"
+            android:layout_marginTop="@dimen/default_margin"
+            android:layout_width="@dimen/progressbar_default" android:layout_height="@dimen/progressbar_default"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/playlist_progress"
+            android:layout_centerInParent="true" />
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/playlist_queue"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:paddingBottom="20dp"
+            android:fitsSystemWindows= "true"
+            android:clipToPadding="false"
+            android:visibility="gone">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/playlist"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingBottom="20dp"
-            android:fitsSystemWindows= "true"
-            android:clipToPadding="false"/>
+            android:layout_marginBottom="16dp"
+            />
+
+        </android.support.v7.widget.CardView>
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

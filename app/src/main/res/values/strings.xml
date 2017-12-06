@@ -6,4 +6,6 @@
     <string name="search_products">search song</string>
     <string name="search_hint">Type title…</string>
     <string name="vote_counter_placeholder">-</string>
+    <string name="addsong_bottomsheet_title">REQUEST SONG</string>
+    <string name="shortcut_title">Request a Song</string>
 </resources>

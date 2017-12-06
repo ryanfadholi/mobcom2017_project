@@ -23,6 +23,13 @@ public class GetNowPlayingResponse extends GetResponseTemplate {
         public NowPlayingSong getNowPlaying() {
 
             String currentRequestID = data.get("request_id").asText();
+
+            if(currentRequestID.equals("false")){
+                NowPlayingSong emptySong = new NowPlayingSong("-1", "",
+                        "", "", "", "", "null");
+                return emptySong;
+            }
+
             String currentMusicID = data.get("musics_id").asText();
             String currentAlbum = data.get("album").asText();
             String currentArtist = data.get("artist").asText();

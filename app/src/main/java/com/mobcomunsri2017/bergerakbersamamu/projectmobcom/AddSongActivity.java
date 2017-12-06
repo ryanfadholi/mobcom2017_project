@@ -3,6 +3,7 @@ package com.mobcomunsri2017.bergerakbersamamu.projectmobcom;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.BottomSheetBehavior;
@@ -19,6 +20,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -47,6 +49,7 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
 
     public static String EXTRA_MUSIC_ID = "AddSong.MusicID";
 
+    private ProgressBar addSongProgressBar;
     private RecyclerView addSongRecyclerView;
     private AddSongAdapter addSongAdapter;
 
@@ -76,6 +79,12 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
         setSupportActionBar(toolbar);
 
         setTitle("Tracklist");
+
+        addSongProgressBar = findViewById(R.id.addsong_progress);
+        addSongProgressBar.getIndeterminateDrawable().setColorFilter(
+                getResources().getColor(R.color.style_default_color),
+                PorterDuff.Mode.MULTIPLY
+        );
 
         addSongRecyclerView = findViewById(R.id.add_song);
         addSongRecyclerView.setHasFixedSize(true);
@@ -108,6 +117,10 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
     @Override
     protected void onResume() {
         super.onResume();
+        selectedSongID = "-1";
+        if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED){
+            hideBottomSheet();
+        }
         fetchData();
     }
 
@@ -148,6 +161,8 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
     }
 
     private void fetchData(){
+        addSongRecyclerView.setVisibility(View.GONE);
+        addSongProgressBar.setVisibility(View.VISIBLE);
         this.fetchVotes();
         this.fetchUserVotes();
         this.fetchSongs();
@@ -174,12 +189,21 @@ public class AddSongActivity extends AppCompatActivity implements AddSongAdapter
                     return;
                 }
 
-                songs.clear();
-                songs.addAll(response.body().getMusics());
+                ArrayList<Song> tracklist = response.body().getMusics();
+
+                //for searchdata
                 songList = new ArrayList<>();
-                songList.addAll(songs);
+                songList.addAll(tracklist);
+
+                songs.clear();
+                songs.addAll(tracklist);
+
                 addSongAdapter.sortDataset();
                 addSongAdapter.notifyDataSetChanged();
+
+                Log.e(LOG_TAG, "Should be here anytime soon....");
+                addSongProgressBar.setVisibility(View.GONE);
+                addSongRecyclerView.setVisibility(View.VISIBLE);
             }
 
             @Override

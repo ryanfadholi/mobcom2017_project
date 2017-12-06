@@ -13,29 +13,37 @@
     tools:showIn="@layout/activity_add_song">
 
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         >
 
+        <ProgressBar android:indeterminate="true"
+            android:layout_width="@dimen/progressbar_default" android:layout_height="@dimen/progressbar_default"
+            android:id="@+id/addsong_progress"
+            android:layout_centerInParent="true" />
+
         <android.support.v7.widget.RecyclerView
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:layout_alignParentTop="true"
             android:paddingBottom="20dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows= "true"
             android:clipToPadding="false"
-            android:id="@+id/add_song"/>
+            android:id="@+id/add_song"
+            android:visibility="gone"/>
 
         <View
+            android:layout_alignBottom="@id/add_song"
             android:id="@+id/sheetPadding"
             android:layout_height="60dp"
             android:layout_width="match_parent">
 
         </View>
 
-    </LinearLayout>
+    </RelativeLayout>
 
 
 

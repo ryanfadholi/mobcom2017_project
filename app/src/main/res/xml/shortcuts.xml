@@ -1,0 +1,13 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="request_song"
+        android:enabled="true"
+        android:icon="@drawable/ic_add_black_24dp"
+        android:shortcutShortLabel="@string/shortcut_title"
+        >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.mobcomunsri2017.bergerakbersamamu.projectmobcom"
+            android:targetClass="com.mobcomunsri2017.bergerakbersamamu.projectmobcom.AddSongActivity" />
+    </shortcut>
+</shortcuts>
