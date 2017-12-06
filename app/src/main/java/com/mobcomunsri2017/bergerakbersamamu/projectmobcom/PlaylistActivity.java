@@ -49,8 +49,9 @@ import java.util.TimerTask;
 public class PlaylistActivity extends AppCompatActivity {
 
 //    public static final String BASE_WEB_SERVICE_URL = "http://192.168.43.144/mpcafe/"; // azhary
-    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mpcafe/"; //ryan ganteng
+//    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.123/mpcafe/"; //ryan ganteng
 //    public static final String BASE_WEB_SERVICE_URL = "http://192.168.0.145/mpcafe/"; //ryan - VAIO
+    public static final String BASE_WEB_SERVICE_URL = "http://10.102.226.200/mpcafe/"; //fasilkoms
 //    public static final String BASE_WEB_SERVICE_URL = "http://10.102.227.131/mpcafe/";
 
     private static final String LOG_TAG = "TG.PlaylistActivity";
@@ -136,8 +137,6 @@ public class PlaylistActivity extends AppCompatActivity {
             }
         }, 1000, 5000);
     }
-
-    private void calculate
 
     private void adjustToolbarStyle(){
         int defaultToolbarColor = getResources().getColor(R.color.colorPrimary);
