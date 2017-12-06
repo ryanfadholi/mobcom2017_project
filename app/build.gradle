@@ -41,9 +41,6 @@ dependencies {
             [group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.1']
     )
 
-    // RecyclerviewAnimation
-    compile 'jp.wasabeef:recyclerview-animators:2.2.7'
-
     // Retrofit & OkHttp
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.retrofit2:converter-jackson:2.3.0'
